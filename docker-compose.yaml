@@ -1,0 +1,26 @@
+version: '3.5'
+
+services:
+    app:
+        image: edriverapp:develop
+        networks:
+            - internal
+        ports:
+            - "5050:5050"
+        env_file:
+            - ./env/docker/app.env
+
+
+    # webapp:
+    postgres:
+        image: postgres:14-alpine
+        networks:
+            - internal
+        ports:
+            - "5432:5432"
+        env_file:
+            - ./env/docker/postgres.env
+        volume:
+            - ./var/data/postgres/data:var/lib/postgresql/data
+        # uncomment to debug query
+        # command:  postgres -c 'log_statement=all'
