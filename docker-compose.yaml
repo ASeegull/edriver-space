@@ -12,6 +12,14 @@ services:
 
 
     # webapp:
+        # image: edriverwebapp:develop
+        # networks:
+        #     - internal
+        # ports:
+        #     - "xxxx:xxxx"
+        # env_file:
+        #     - ./env/docker/webapp.env
+
     postgres:
         image: postgres:14-alpine
         networks:
@@ -21,6 +29,7 @@ services:
         env_file:
             - ./env/docker/postgres.env
         volume:
-            - ./var/data/postgres/data:var/lib/postgresql/data
+            - ./var/postgres/data:var/lib/postgresql/data
+            - ./env/postgres/env.sql:docker-entrypoint-initdb.d/env.sql
         # uncomment to debug query
         # command:  postgres -c 'log_statement=all'
