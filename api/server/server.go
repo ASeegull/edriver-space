@@ -33,7 +33,6 @@ func getVersion() echo.HandlerFunc {
 	}
 }
 
-//
 func hello() echo.HandlerFunc {
 	return func(context echo.Context) error {
 		hi := "Hello Lv-644.Go!"
