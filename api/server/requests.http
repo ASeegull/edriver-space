@@ -1,0 +1,5 @@
+### Home
+GET http://localhost:1323/
+
+### Get version
+GET http://localhost:1323/version
