@@ -14,7 +14,7 @@ type Config struct {
 	ServerPort    string `mapstructure:"SERVER_PORT"`
 }
 
-//LoadConfig reads configuration from .env file
+//LoadConfig reads configuration from .env  file
 func LoadConfig(path string) (config Config, err error) {
 
 	//Setting default path for config file
