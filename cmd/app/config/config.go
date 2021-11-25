@@ -11,6 +11,7 @@ type Config struct {
 	DBDriver      string `mapstructure:"DB_DRIVER"`
 	DBSource      string `mapstructure:"DB_SOURCE"`
 	ServerAddress string `mapstructure:"SERVER_ADDRESS"`
+	ServerPort    string `mapstructure:"SERVER_PORT"`
 }
 
 //LoadConfig reads configuration from .env file
