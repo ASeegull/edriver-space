@@ -52,7 +52,7 @@ func MustGetConnection() *sqlx.DB {
 	return db
 }
 
-func main() {
+func connect() {
 	// Verify if connection is ok
 	conn := MustGetConnection()
 	err := conn.Ping()
