@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"sync"
 
@@ -50,18 +49,4 @@ func MustGetConnection() *sqlx.DB {
 		db.SetMaxOpenConns(10)
 	})
 	return db
-}
-
-func connect() {
-	// Verify if connection is ok
-	conn := MustGetConnection()
-	err := conn.Ping()
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Successfully connected ✓")
-	err = conn.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
 }
