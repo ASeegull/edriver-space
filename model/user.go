@@ -1,6 +1,7 @@
-package server
+package model
 
 import (
+	"github.com/ASeegull/edriver-space/api/server"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
@@ -25,8 +26,8 @@ type User struct {
 	Restrictions string `json:"restrictions"`
 }
 
-// createUser creates new user
-func (s *Server) createUser() echo.HandlerFunc {
+// CreateUser creates new user
+func CreateUser(s *server.Server) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		var u User // Store user info
 
@@ -43,8 +44,8 @@ func (s *Server) createUser() echo.HandlerFunc {
 	}
 }
 
-// getUsers returns all users
-func (s *Server) getUsers() echo.HandlerFunc {
+// GetUsers returns all users
+func GetUsers(s *server.Server) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		users := make([]User, 0) // Store all users data
 
@@ -60,8 +61,8 @@ func (s *Server) getUsers() echo.HandlerFunc {
 	}
 }
 
-// getUser returns user by id
-func (s *Server) getUser() echo.HandlerFunc {
+// GetUser returns user by id
+func GetUser(s *server.Server) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		var u User                               // Store user info
 		ID, err := strconv.Atoi(ctx.Param("id")) // This will get an id parameter from the url
@@ -86,8 +87,8 @@ func (s *Server) getUser() echo.HandlerFunc {
 	}
 }
 
-// updateUser changes provided fields of user with given id
-func (s *Server) updateUser() echo.HandlerFunc {
+// UpdateUser changes provided fields of user with given id
+func UpdateUser(s *server.Server) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		var u User                           // store user data to replace for
 		if err := ctx.Bind(&u); err != nil { // Binds http request data to provided argument
@@ -148,8 +149,8 @@ func (s *Server) updateUser() echo.HandlerFunc {
 	}
 }
 
-// deleteUser removes user
-func (s *Server) deleteUser() echo.HandlerFunc {
+// DeleteUser removes user
+func DeleteUser(s *server.Server) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		ID, err := strconv.Atoi(ctx.Param("id")) // This will get an id parameter from the url
 		if err != nil {

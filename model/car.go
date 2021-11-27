@@ -1,6 +1,7 @@
-package server
+package model
 
 import (
+	"github.com/ASeegull/edriver-space/api/server"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
@@ -32,8 +33,8 @@ type Car struct {
 	Ownership string `json:"ownership"`
 }
 
-// createCar creates new car
-func (s *Server) createCar() echo.HandlerFunc {
+// CreateCar creates new car
+func CreateCar(s *server.Server) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		var c Car // Store car info
 
@@ -50,8 +51,8 @@ func (s *Server) createCar() echo.HandlerFunc {
 	}
 }
 
-// getCars returns all cars
-func (s *Server) getCars() echo.HandlerFunc {
+// GetCars returns all cars
+func GetCars(s *server.Server) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		cars := make([]Car, 0) // Store all cars
 
@@ -67,8 +68,8 @@ func (s *Server) getCars() echo.HandlerFunc {
 	}
 }
 
-// getCar returns car by id
-func (s *Server) getCar() echo.HandlerFunc {
+// GetCar returns car by id
+func GetCar(s *server.Server) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		var c Car                                // Store car info
 		ID, err := strconv.Atoi(ctx.Param("id")) // This will get an id parameter from the url
@@ -93,8 +94,8 @@ func (s *Server) getCar() echo.HandlerFunc {
 	}
 }
 
-// updateCar changes provided fields of car with given id
-func (s *Server) updateCar() echo.HandlerFunc {
+// UpdateCar changes provided fields of car with given id
+func UpdateCar(s *server.Server) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		var c Car                            // store car data to replace for
 		if err := ctx.Bind(&c); err != nil { // Binds http request data to provided argument
@@ -175,8 +176,8 @@ func (s *Server) updateCar() echo.HandlerFunc {
 	}
 }
 
-// deleteCar removes car
-func (s *Server) deleteCar() echo.HandlerFunc {
+// DeleteCar removes car
+func DeleteCar(s *server.Server) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		ID, err := strconv.Atoi(ctx.Param("id")) // This will get an id parameter from the url
 		if err != nil {
