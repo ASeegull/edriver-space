@@ -2,40 +2,58 @@ package server
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"net/http"
 )
 
 type Server struct {
 	*echo.Echo
+	Users []User
+	Cars  []Car
 }
 
-// NewServer creates new server
+// NewServer starts new server
 func NewServer() *Server {
 	s := &Server{
-		Echo: echo.New(),
+		Echo:  echo.New(),
+		Users: []User{},
+		Cars:  []Car{},
 	}
+	// All possible routes
 	s.routes()
 	return s
 }
 
 // routes stores all possible routes
 func (s *Server) routes() {
-	s.GET("/", hello(), middleware.Logger())             // Home
-	s.GET("/version", getVersion(), middleware.Logger()) // Get project version
+	s.GET("/", s.hello())             // Home
+	s.GET("/Version", s.getVersion()) // Get project version
+
+	// Users CRUD
+	s.GET("/Users", s.getUsers())         // Get all users
+	s.GET("/User/:id", s.getUser())       // Get user by id
+	s.POST("/User", s.createUser())       // Create new user
+	s.PATCH("/User/:id", s.updateUser())  // Update user data
+	s.DELETE("/User/:id", s.deleteUser()) // Delete user
+
+	// Cars CRUD
+	s.GET("/Cars", s.getCars())         // Get all cars
+	s.GET("/Car/:id", s.getCar())       // Get car by id
+	s.POST("/Car", s.createCar())       // Create new car
+	s.PATCH("/Car/:id", s.updateCar())  // Update car data
+	s.DELETE("/Car/:id", s.deleteCar()) // Delete car
 }
 
 // getVersion returns current version of the app
-func getVersion() echo.HandlerFunc {
-	return func(context echo.Context) error {
+func (s *Server) getVersion() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
 		version := "0.0" // Use environment variable instead
-		return context.String(http.StatusOK, version)
+		return ctx.JSON(http.StatusOK, version)
 	}
 }
 
-func hello() echo.HandlerFunc {
-	return func(context echo.Context) error {
+func (s *Server) hello() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
 		hi := "Hello Lv-644.Go!"
-		return context.String(http.StatusOK, hi)
+		return ctx.JSON(http.StatusOK, hi)
 	}
 }
