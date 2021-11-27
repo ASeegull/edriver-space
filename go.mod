@@ -1,4 +1,4 @@
-module e-driver
+module github.com/ASeegull/edriver-space
 
 go 1.17
 
