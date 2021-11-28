@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/viper"
 )
@@ -37,6 +38,11 @@ func LoadConfig(path string) (config Config, err error) {
 
 	//Parsing config vals from file (second step)
 	err = viper.Unmarshal(&config)
+
+	//If it is nescessary to hardcore port - just add value for SERVER_PORT in .env file
+	if config.ServerPort == "" {
+		config.ServerPort = os.Getenv("SERVER_PORT")
+	}
 
 	return
 
