@@ -30,18 +30,18 @@ func (s *Server) routes() {
 	s.GET("/Version", s.getVersion()) // Get project version
 
 	// Users CRUD
-	s.GET("/Users", model.GetUsers(s))         // Get all users
-	s.GET("/User/:id", model.GetUser(s))       // Get user by id
-	s.POST("/User", model.CreateUser(s))       // Create new user
-	s.PATCH("/User/:id", model.UpdateUser(s))  // Update user data
-	s.DELETE("/User/:id", model.DeleteUser(s)) // Delete user
+	s.GET("/Users", s.getUsers())         // Get all users
+	s.GET("/User/:id", s.getUser())       // Get user by id
+	s.POST("/User", s.createUser())       // Create new user
+	s.PATCH("/User/:id", s.updateUser())  // Update user data
+	s.DELETE("/User/:id", s.deleteUser()) // Delete user
 
 	// Cars CRUD
-	s.GET("/Cars", model.GetCars(s))         // Get all cars
-	s.GET("/Car/:id", model.GetCar(s))       // Get car by id
-	s.POST("/Car", model.CreateCar(s))       // Create new car
-	s.PATCH("/Car/:id", model.UpdateCar(s))  // Update car data
-	s.DELETE("/Car/:id", model.DeleteCar(s)) // Delete car
+	s.GET("/Cars", s.getCars())         // Get all cars
+	s.GET("/Car/:id", s.getCar())       // Get car by id
+	s.POST("/Car", s.createCar())       // Create new car
+	s.PATCH("/Car/:id", s.updateCar())  // Update car data
+	s.DELETE("/Car/:id", s.deleteCar()) // Delete car
 }
 
 // getVersion returns current version of the app
