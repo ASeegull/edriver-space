@@ -14,16 +14,17 @@ import (
 
 func main() {
 	fmt.Println("Hello Lv-644.Go!")
-
-	// Path to env
-	if err := godotenv.Load("env/docker/postgres.env", "env/docker/app.env"); err != nil {
-		log.Fatalf("error loading env variables: %s", err.Error())
-	}
+	
 	//Initializing Logger
 	logger.LogInit()
 
 	// Loading config values
 	conf, err := config.LoadConfig("")
+	
+	// Path to env
+	if err := godotenv.Load("env/docker/postgres.env", "env/docker/app.env"); err != nil {
+		logger.LogFatal(fmt.Errorf("error loading env variables: %s", err.Error()))
+	}
 
 	if err != nil {
 		logger.LogErr(err)
