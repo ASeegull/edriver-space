@@ -44,7 +44,8 @@ func MustGetConnection() *sqlx.DB {
 		var err error
 		db, err = sqlx.Connect("postgres", dbURI)
 		if err != nil {
-			logger.LogMsg(fmt.Sprintf("Unable to connection to database: %v\n", err),"Panic")
+			logger.LogErr(err)
+			panic(fmt.Sprintf("Unable to connection to database: %v\n", err))
 		}
 		db.SetMaxIdleConns(10)
 		db.SetMaxOpenConns(10)
