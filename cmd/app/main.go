@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
-
 
 	"github.com/ASeegull/edriver-space/api/server"
 	"github.com/ASeegull/edriver-space/config"
