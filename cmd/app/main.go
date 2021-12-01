@@ -16,8 +16,9 @@ func main() {
 
 	// Loading config values
 	conf, err := config.LoadConfig("")
+
 	if err != nil {
-		fmt.Println(err)
+		logger.LogErr(err)
 	}
 
 	//Creating and starting server
