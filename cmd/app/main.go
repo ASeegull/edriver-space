@@ -28,10 +28,11 @@ func main() {
 		logger.LogErr(err)
 	}
 
+	//Verify if connection is ok
+	storage.InitConnection()
+
 	//Creating and starting server
 	s := server.NewServer()
 	logger.LogFatal(s.Start(":" + conf.ServerPort))
 
-	// Verify if connection is ok
-	storage.InitConnection()
 }
