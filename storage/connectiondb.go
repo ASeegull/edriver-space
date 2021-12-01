@@ -1,10 +1,11 @@
-package main
+package storage
 
 import (
 	"fmt"
 	"os"
 	"sync"
-
+	
+	"github.com/ASeegull/edriver-space/logger"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
@@ -43,10 +44,28 @@ func MustGetConnection() *sqlx.DB {
 		var err error
 		db, err = sqlx.Connect("postgres", dbURI)
 		if err != nil {
-			panic(fmt.Sprintf("Unable to connection to database: %v\n", err))
+			logger.LogMsg(fmt.Sprintf("Unable to connection to database: %v\n", err),"Panic")
 		}
 		db.SetMaxIdleConns(10)
 		db.SetMaxOpenConns(10)
 	})
 	return db
 }
+
+func InitConnection() {
+	
+	conn := MustGetConnection()
+	conErr := conn.Ping()
+	
+	if conErr != nil {
+		logger.Fatal(conErr)
+	}
+	fmt.Println("Successfully connected ✓")
+	
+	defer func() {
+		if conErr := conn.Close(); conErr != nil {
+			fmt.Println("db connection closed.")
+		}
+	}()
+}
+
