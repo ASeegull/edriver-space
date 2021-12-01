@@ -19,13 +19,13 @@ func main() {
 	// Loading config values
 	conf, err := config.LoadConfig("")
 	
+	if err != nil {
+		logger.LogErr(err)
+	}
+
 	// Path to env
 	if err := godotenv.Load("env/docker/postgres.env", "env/docker/app.env"); err != nil {
 		logger.LogFatal(fmt.Errorf("error loading env variables: %s", err.Error()))
-	}
-
-	if err != nil {
-		logger.LogErr(err)
 	}
 
 	//Verify if connection is ok
