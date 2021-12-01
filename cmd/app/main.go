@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+
 	"github.com/ASeegull/edriver-space/api/server"
 	"github.com/ASeegull/edriver-space/config"
 	"github.com/ASeegull/edriver-space/logger"
@@ -17,7 +18,6 @@ func main() {
 	if err := godotenv.Load("env/docker/postgres.env", "env/docker/app.env"); err != nil {
 		log.Fatalf("error loading env variables: %s", err.Error())
 	}
-
 	//Initializing Logger
 	logger.LogInit()
 
@@ -44,5 +44,4 @@ func main() {
 			fmt.Println("db connection closed.")
 		}
 	}()
-
 }
