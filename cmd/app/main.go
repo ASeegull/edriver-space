@@ -8,6 +8,7 @@ import (
 	"github.com/ASeegull/edriver-space/api/server"
 	"github.com/ASeegull/edriver-space/config"
 	"github.com/ASeegull/edriver-space/logger"
+	"github.com/ASeegull/edriver-space/storage"
 	"github.com/joho/godotenv"
 )
 
@@ -33,15 +34,5 @@ func main() {
 	logger.LogFatal(s.Start(":" + conf.ServerPort))
 
 	// Verify if connection is ok
-	conn := MustGetConnection()
-	conErr := conn.Ping()
-	if conErr != nil {
-		log.Fatal(conErr)
-	}
-	fmt.Println("Successfully connected ✓")
-	defer func() {
-		if conErr := conn.Close(); conErr != nil {
-			fmt.Println("db connection closed.")
-		}
-	}()
+	storage.InitConnection()
 }
