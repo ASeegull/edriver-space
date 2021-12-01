@@ -58,7 +58,7 @@ func InitConnection() {
 	conErr := conn.Ping()
 	
 	if conErr != nil {
-		logger.Fatal(conErr)
+		logger.LogFatal(conErr)
 	}
 	fmt.Println("Successfully connected ✓")
 	
