@@ -1,17 +1,16 @@
 package storage
 
 import (
+	"database/sql"
 	"fmt"
+	"github.com/ASeegull/edriver-space/logger"
+	_ "github.com/lib/pq"
 	"os"
 	"sync"
-	
-	"github.com/ASeegull/edriver-space/logger"
-	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
 )
 
 var (
-	db   *sqlx.DB
+	db   *sql.DB
 	once sync.Once
 )
 
@@ -30,7 +29,7 @@ var (
 // docker run -d -p 5432:5432 postgres:latest
 
 // MustGetConnection returns database connection
-func MustGetConnection() *sqlx.DB {
+func MustGetConnection() *sql.DB {
 	once.Do(func() {
 		pguser := os.Getenv("PGUSER")
 		pgdb := os.Getenv("PGDB")
@@ -42,7 +41,7 @@ func MustGetConnection() *sqlx.DB {
 			dbURI += " password=" + pgpass
 		}
 		var err error
-		db, err = sqlx.Connect("postgres", dbURI)
+		db, err = sql.Open("postgres", dbURI)
 		if err != nil {
 			logger.LogErr(err)
 			panic(fmt.Sprintf("Unable to connection to database: %v\n", err))
@@ -52,21 +51,3 @@ func MustGetConnection() *sqlx.DB {
 	})
 	return db
 }
-
-func InitConnection() {
-	
-	conn := MustGetConnection()
-	conErr := conn.Ping()
-	
-	if conErr != nil {
-		logger.LogFatal(conErr)
-	}
-	fmt.Println("Successfully connected ✓")
-	
-	defer func() {
-		if conErr := conn.Close(); conErr != nil {
-			fmt.Println("db connection closed.")
-		}
-	}()
-}
-
