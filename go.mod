@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/labstack/echo/v4 v4.6.1
 	github.com/pressly/goose/v3 v3.3.1
+	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/viper v1.9.0
 )
 
