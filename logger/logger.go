@@ -42,7 +42,34 @@ func LogErr(errMsg error) {
 	log.Error(errMsg)
 }
 
-// LogFatal() func delivers fatal error to logs
+// LogErrWithFields() func allows to log some error with additional fields in JSON format.
+// In order to add fields to message, provide a map value with type [string]string
+// (in format [JSON-key]JSON-value)
+func LogErrWithFields(errMsg error, fields map[string]string) {
+	var params *log.Entry
+
+	if len(fields) > 0 {
+		isFirstRecord := true
+
+		for key, val := range fields {
+			if isFirstRecord {
+				// Creating new log.Entry if it is the first fields value
+				params = log.WithField(key, val)
+				isFirstRecord = false
+			} else {
+				// Using excisting log.Entry if it isn't the first fields value
+				params = params.WithField(key, val)
+			}
+		}
+	} else {
+		// Delivering a hint to log if fields value is empty
+		params = log.WithField("Hint", "Try to use LogErr() func when not using additional fields")
+	}
+
+	params.Error(errMsg)
+}
+
+// LogFatal() func delivers fatal error to logs and shuts down the program
 func LogFatal(errMsg error) {
 	log.Fatal(errMsg)
 }
@@ -55,8 +82,6 @@ func LogMsg(msg string, logType string) (err error) {
 		log.Info(msg)
 	case "Warn":
 		log.Warn(msg)
-	case "Panic":
-		log.Panic(msg)
 	case "Trace":
 		log.Trace(msg)
 	case "Debug":
