@@ -1,0 +1,32 @@
+name: Ci
+
+on: [push, pull_request]
+
+jobs:
+
+  build:
+    strategy:
+	    matrix:
+		     os: ["windows-latest", "ubuntu-latest", "macOS-latest"]
+		     go: ["1.16.x", "1.17.x"]
+	  runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ matrix.go }}
+
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ matrix.go }}
+
+    - name: Lint
+      run: |
+        export PATH=${PATH}:`go env GOPATH`/bin
+        make lint
+
+    - name: Test
+      run: go test ./...
