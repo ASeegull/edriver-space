@@ -7,21 +7,20 @@ jobs:
   build:
     strategy:
 	    matrix:
-		     os: ["windows-latest", "ubuntu-latest", "macOS-latest"]
 		     go: ["1.16.x", "1.17.x"]
-	  runs-on: ${{ matrix.os }}
+	  runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
 
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{ matrix.go }}
+        go-version: ubuntu-latest
 
     - name: Install Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{ matrix.go }}
+        go-version: ubuntu-latest
 
     - name: Lint
       run: |
