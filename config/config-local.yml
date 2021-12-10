@@ -1,0 +1,31 @@
+server:
+  Port: :1323
+  CookieName: session_id
+  ReadTimeout: 5
+  WriteTimeout: 5
+  CtxDefaultTimeout: 12
+  CSRF: true
+
+postgres:
+  PostgresqlHost: localhost
+  PostgresqlPort: 5432
+  PostgresqlUser: postgres
+  PostgresqlPassword: postgres
+  PostgresqlDbname: edriver
+  PostgresqlSslmode: disable
+  PostgresqlDriver: postgres
+
+redis:
+  RedisAddr: localhost:6379
+  Password: ""
+  DB: 0
+
+cookie:
+  Name: session_id
+  MaxAge: 86400
+  Secure: false
+  HttpOnly: true
+
+session:
+  Name: session_id
+  Expire: 3600

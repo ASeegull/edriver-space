@@ -1,70 +1,83 @@
 package config
 
 import (
-	"fmt"
-	"os"
-
+	"errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"time"
 )
 
-//Config struct stores all configuration values for project using Viper
 type Config struct {
-	DBDriver      string `mapstructure:"DB_DRIVER"`
-	DBSource      string `mapstructure:"DB_SOURCE"`
-	ServerAddress string `mapstructure:"SERVER_ADDRESS"`
-	ServerPort    string `mapstructure:"SERVER_PORT"`
+	Server   ServerConfig
+	Postgres PostgresConfig
+	Redis    RedisConfig
+	Cookie   Cookie
+	Session  Session
 }
 
-//LoadConfig reads configuration from .env  file
-func LoadConfig(path string) (config Config, err error) {
+type ServerConfig struct {
+	Port              string
+	CookieName        string
+	ReadTimeout       time.Duration
+	WriteTimeout      time.Duration
+	CtxDefaultTimeout time.Duration
+	CSRF              bool
+}
 
-	//Setting default path for config file
-	if path == "" {
-		path = "./config"
+type PostgresConfig struct {
+	PostgresqlHost     string
+	PostgresqlPort     string
+	PostgresqlUser     string
+	PostgresqlPassword string
+	PostgresqlDbname   string
+	PostgresqlSSLMode  string
+	PostgresqlDriver   string
+}
+
+type RedisConfig struct {
+	RedisAddr string
+	Password  string
+	DB        int
+}
+
+type Cookie struct {
+	Name     string
+	MaxAge   int
+	Secure   bool
+	HTTPOnly bool
+}
+
+type Session struct {
+	Name   string
+	Expire int
+}
+
+//LoadConfig - Load config file from given path
+func LoadConfig(filename string) (*viper.Viper, error) {
+	v := viper.New()
+
+	v.SetConfigName(filename)
+	v.AddConfigPath(".")
+	v.AutomaticEnv()
+	if err := v.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			return nil, errors.New("config file not found")
+		}
+		return nil, err
 	}
 
-	//Declareting path and type for config file
-	viper.AddConfigPath(path)
-	viper.SetConfigType("env")
+	return v, nil
+}
 
-	viper.AutomaticEnv()
+//ParseConfig - Parse config file
+func ParseConfig(v *viper.Viper) (*Config, error) {
+	var c Config
 
-	//Parsing config vals from file (first step)
-	err = viper.ReadInConfig()
-
+	err := v.Unmarshal(&c)
 	if err != nil {
-		return
+		log.Printf("unable to decode into struct, %v", err)
+		return nil, err
 	}
 
-	//Parsing config vals from file (second step)
-	err = viper.Unmarshal(&config)
-
-	//If it is nescessary to hardcore port - just add value for SERVER_PORT in .env file
-	if config.ServerPort == "" {
-		config.ServerPort = os.Getenv("SERVER_PORT")
-	}
-
-	return
-
-}
-
-// GetConfigString returns specific value from config file
-func GetConfigString(ValName string) (val string, err error) {
-
-	//Loading config
-	config, _ := LoadConfig("./config")
-
-	switch ValName {
-	case "DBDriver":
-		val = config.DBDriver
-	case "DBSource":
-		val = config.DBSource
-	case "ServerAddress":
-		val = config.ServerAddress
-	default:
-		err = fmt.Errorf("Cannot find value " + ValName)
-	}
-
-	return
-
+	return &c, nil
 }
