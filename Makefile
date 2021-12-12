@@ -13,3 +13,6 @@ staticcheck:
 	
 lint:
 	staticcheck ./...
+
+test:
+	go test -race -failfast ./...

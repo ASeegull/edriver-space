@@ -1,26 +1,26 @@
 name: Lint
 
-on: [push, pull_request]
+on: push
 
 jobs:
 
-	build:
-		strategy:
-			matrix:
-				go: ["1.16.x", "1.17.x"]
-		runs-on: ubuntu-latest
-		steps:
-		- uses: actions/checkout@v2
+  build:
+    strategy:
+      matrix:
+        go: ["1.16.x", "1.17.x"]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
 
-		- name: Set up Go
-			uses: actions/setup-go@v2
-			with:
-				go-version: 1.16
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
 
-		- name: Lint
-			run: |
-				export PATH=${PATH}:`go env GOPATH`/bin
-				make lint
+    - name: Lint
+      run: |
+        export PATH=${PATH}:`go env GOPATH`/bin
+        make lint
 
-		- name: Test
-			run: go test ./...
+    - name: Test
+      run: go test ./...

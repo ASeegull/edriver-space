@@ -1,10 +1,9 @@
 name: Unit tests
 
 # Trigger the workflow on pull requests and direct pushes to any branch
-on: [push, pull_request]
+on: push
 
 jobs:
-
   test:
     name: ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -21,10 +20,6 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: '1.16'
-      # This step is needed as the following one tries to remove
-      # kustomize for each test but has no permission to do so
-      - name: Remove pre-installed kustomize
-        run: sudo rm -f /usr/local/bin/kustomize
       - name: Perform the test
         run: make test
       - name: Report failure
