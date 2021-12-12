@@ -1,6 +1,5 @@
 IMG ?= edriverapp:develop
 
-
 all: build
 
 build:
@@ -8,3 +7,9 @@ build:
 
 docker-build:
 	docker build . -t ${IMG} 
+
+staticcheck: 
+	go get -u honnef.co/go/tools/cmd/staticcheck
+	
+lint:
+	staticcheck ./...
