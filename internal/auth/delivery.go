@@ -7,4 +7,6 @@ type Handlers interface {
 	Logout() echo.HandlerFunc
 	GetMe() echo.HandlerFunc
 	GetCSRFToken() echo.HandlerFunc
+	//Welcome() echo.HandlerFunc
+	RefreshTokens() echo.HandlerFunc
 }

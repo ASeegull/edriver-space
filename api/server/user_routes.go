@@ -52,7 +52,7 @@ func (s *Server) getUser() echo.HandlerFunc {
 		}
 
 		/*
-			Work with database, get user with id == ID
+			Work with database, get user with id == Id
 		*/
 
 		// Code below may be changed after database implementation
@@ -82,7 +82,7 @@ func (s *Server) updateUser() echo.HandlerFunc {
 		}
 
 		/*
-			Work with database, assign not empty values of u to fields of user with id == ID
+			Work with database, assign not empty values of u to fields of user with id == Id
 		*/
 
 		// Code below may be changed after database implementation
@@ -139,7 +139,7 @@ func (s *Server) deleteUser() echo.HandlerFunc {
 		}
 
 		/*
-			Work with database, delete user with id == ID
+			Work with database, delete user with id == Id
 		*/
 
 		// Code below may be changed after database implementation

@@ -52,7 +52,7 @@ func (s *Server) getCar() echo.HandlerFunc {
 		}
 
 		/*
-			Work with database, get car with id == ID
+			Work with database, get car with id == Id
 		*/
 
 		// Code below may be changed after database implementation
@@ -82,7 +82,7 @@ func (s *Server) updateCar() echo.HandlerFunc {
 		}
 
 		/*
-			Work with database, assign not empty values of c to fields of car with id == ID
+			Work with database, assign not empty values of c to fields of car with id == Id
 		*/
 
 		// Code below may be changed after database implementation
@@ -159,7 +159,7 @@ func (s *Server) deleteCar() echo.HandlerFunc {
 		}
 
 		/*
-			Work with database, delete car with id == ID
+			Work with database, delete car with id == Id
 		*/
 
 		// Code below may be changed after database implementation

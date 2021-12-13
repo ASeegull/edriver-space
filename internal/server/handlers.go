@@ -7,20 +7,23 @@ import (
 	"github.com/ASeegull/edriver-space/internal/middleware"
 	sessRepository "github.com/ASeegull/edriver-space/internal/session/repository"
 	sessUseCase "github.com/ASeegull/edriver-space/internal/session/usecase"
+	jwt "github.com/ASeegull/edriver-space/pkg/auth"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
 
 func (s *Server) MapHandlers(e *echo.Echo) error {
+	jwtManager, _ := jwt.NewJWTManager("secret_key")
+
 	authRepo := authRepository.NewAuthRepository(s.db)
 	sessRepo := sessRepository.NewSessionRepo(s.redisClient)
 
-	authUC := authUseCase.NewAuthUseCase(authRepo, s.cfg)
-	sessUC := sessUseCase.NewSessionUseCase(sessRepo, s.cfg)
+	authUC := authUseCase.NewAuthUseCase(authRepo, s.cfg, jwtManager)
+	sessUC := sessUseCase.NewSessionUseCase(sessRepo, s.cfg, jwtManager)
 
 	authHandlers := authHttp.NewAuthHandlers(authUC, sessUC, s.cfg)
 
-	mw := middleware.NewMiddleware(sessUC, authUC, s.cfg)
+	mw := middleware.NewMiddleware(sessUC, authUC, s.cfg, jwtManager)
 
 	v1 := e.Group("/api/v1")
 

@@ -1,16 +1,17 @@
 package http
 
 import (
-	"fmt"
 	"github.com/ASeegull/edriver-space/config"
 	"github.com/ASeegull/edriver-space/internal/auth"
 	"github.com/ASeegull/edriver-space/internal/models"
 	"github.com/ASeegull/edriver-space/internal/session"
 	"github.com/ASeegull/edriver-space/pkg/csrf"
 	"github.com/ASeegull/edriver-space/pkg/httpErrors"
+	"github.com/ASeegull/edriver-space/pkg/utils"
 	"github.com/labstack/echo/v4"
 	log "github.com/sirupsen/logrus"
 	"net/http"
+	"time"
 )
 
 type authHandlers struct {
@@ -33,65 +34,50 @@ func (h *authHandlers) Login() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, err.Error())
 		}
 
-		userWithToken, err := h.authUC.Login(ctx, user)
+		uwt, err := h.authUC.Login(ctx, user)
 		if err != nil {
 			return c.JSON(httpErrors.ErrorResponse(err))
 		}
 
-		newSession := &models.Session{
-			UserID: userWithToken.User.ID,
-		}
-
-		sessionID, err := h.sessUC.CreateSession(ctx, newSession, 300)
-		if err != nil {
+		ttl := time.Duration(h.cfg.Tokens.RefreshTokenTTL) * time.Minute
+		if err := h.sessUC.CreateSession(ctx, uwt.User.Id, uwt.Tokens.RefreshToken, ttl); err != nil {
 			log.Warn(err.Error())
 			return err
 		}
 
-		c.SetCookie(&http.Cookie{
-			Name:     h.cfg.Session.Name,
-			Value:    sessionID,
-			MaxAge:   h.cfg.Session.Expire,
-			HttpOnly: h.cfg.Cookie.HTTPOnly,
-			SameSite: 0,
+		log.Info("New access token - ", uwt.Tokens.AccessToken)
+
+		c.SetCookie(utils.CreateCookie(uwt.Tokens.RefreshToken, h.cfg))
+
+		return c.JSON(http.StatusOK, map[string]string{
+			"accessToken":  uwt.Tokens.AccessToken,
 		})
-
-		log.Info("session_id=", sessionID)
-
-		return c.JSON(http.StatusOK, userWithToken)
 	}
 }
 
 func (h *authHandlers) Logout() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		fmt.Println(c.Get("user"))
-
-		cookie, err := c.Cookie("session_id")
+		refreshToken, err := c.Cookie(h.cfg.Cookie.Name)
 		if err != nil {
 			if err == http.ErrNoCookie {
 				return c.JSON(http.StatusUnauthorized, err.Error())
 			}
-			return c.JSON(httpErrors.ErrorResponse(err))
+			return c.JSON(http.StatusUnauthorized, err.Error())
 		}
 
-		if err := h.sessUC.DeleteByID(c.Request().Context(), cookie.Value); err != nil {
-			return c.JSON(httpErrors.ErrorResponse(err))
+		if err := h.sessUC.DeleteByID(c.Request().Context(), refreshToken.Value); err != nil {
+			return c.JSON(http.StatusInternalServerError, err.Error())
 		}
 
-		c.SetCookie(&http.Cookie{
-			Name:   cookie.Name,
-			Value:  "",
-			Path:   "/",
-			MaxAge: -1,
-		})
+		c.SetCookie(utils.DeleteCookie(refreshToken.Name))
 
-		return c.JSON(http.StatusOK, "ok")
+		return c.JSON(http.StatusOK, "logout")
 	}
 }
 
 func (h authHandlers) GetMe() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		user, ok := c.Get("user").(*models.User)
+		user, ok := c.Get("user").(map[string]string)
 		if !ok {
 			return c.JSON(http.StatusUnauthorized, ok)
 		}
@@ -117,5 +103,48 @@ func (h authHandlers) GetCSRFToken() echo.HandlerFunc {
 		c.Request().Header.Set("Access-Control-Expose-Headers", csrf.CSRFHeader)
 
 		return c.NoContent(http.StatusOK)
+	}
+}
+
+//func (h authHandlers) Welcome() echo.HandlerFunc {
+//	return func(c echo.Context) error {
+//		cookie, err := c.Cookie("jwt_token")
+//		if err != nil {
+//			if err == http.ErrNoCookie {
+//				return c.JSON(http.StatusUnauthorized, "no cookie")
+//			}
+//			return c.JSON(http.StatusUnauthorized, err.Error())
+//		}
+//
+//		claims, err := utils.ExtractClaimsFromJWT(cookie.Value)
+//		if err != nil {
+//			return c.JSON(http.StatusBadRequest, err)
+//		}
+//
+//		return c.JSON(http.StatusOK, claims)
+//	}
+//}
+
+func (h authHandlers) RefreshTokens() echo.HandlerFunc {
+	return func(c echo.Context) error {
+
+		cookie, err := c.Cookie(h.cfg.Cookie.Name)
+		if err != nil {
+			if err == http.ErrNoCookie {
+				return c.JSON(http.StatusUnauthorized, err.Error())
+			}
+			return c.JSON(http.StatusUnauthorized, err.Error())
+		}
+
+		newTokens, err := h.sessUC.RefreshSession(c.Request().Context(), cookie.Value)
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, err.Error())
+		}
+
+		c.SetCookie(utils.CreateCookie(newTokens.RefreshToken, h.cfg))
+
+		return c.JSON(http.StatusOK, map[string]string{
+			"accessToken":  newTokens.AccessToken,
+		})
 	}
 }

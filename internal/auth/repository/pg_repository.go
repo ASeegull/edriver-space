@@ -3,9 +3,9 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"github.com/ASeegull/edriver-space/internal/auth"
 	"github.com/ASeegull/edriver-space/internal/models"
-	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -20,26 +20,30 @@ func NewAuthRepository(db *sql.DB) auth.Repository {
 func (r *authRepo) FindByLogin(ctx context.Context, user *models.User) (*models.User, error) {
 	foundUser := &models.User{}
 	if err := r.db.QueryRowContext(ctx, "SELECT * FROM users WHERE login = $1;", user.Login).Scan(
-		&foundUser.ID,
+		&foundUser.Id,
 		&foundUser.Login,
 		&foundUser.Password,
+		&foundUser.Role,
 	); err != nil {
-		log.Warn(err.Error())
 		return nil, err
 	}
+	fmt.Println("found by login", foundUser)
 	return foundUser, nil
 }
 
-func (r *authRepo) GetUserByID(ctx context.Context, userID int) (*models.User, error) {
+func (r *authRepo) GetUserByID(ctx context.Context, userID string) (*models.User, error) {
 	user := &models.User{}
 
 	if err := r.db.QueryRowContext(ctx, "SELECT * FROM users WHERE id = $1", userID).Scan(
-		&user.ID,
+		&user.Id,
 		&user.Login,
 		&user.Password,
-	); err != nil {
+		&user.Role,
+	)
+	err != nil{
 		return nil, err
 	}
+	fmt.Println("found by id", user)
 	return user, nil
 }
 

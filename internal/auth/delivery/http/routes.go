@@ -9,8 +9,9 @@ import (
 func MapAuthRoutes(authGroup *echo.Group, h auth.Handlers, mw *middleware.Middleware) {
 	authGroup.POST("/login", h.Login())
 	authGroup.POST("/logout", h.Logout())
-
-	authGroup.Use(mw.AuthSessionMiddleware)
-	authGroup.GET("/token", h.GetCSRFToken())
-	authGroup.GET("/me", h.GetMe(), mw.CSRF)
+	authGroup.GET("/refresh-tokens", h.RefreshTokens())
+	//authGroup.GET("/welcome", h.Welcome())
+	authGroup.Use(mw.AuthJWTMiddleware)
+	//authGroup.GET("/token", h.GetCSRFToken())
+	authGroup.GET("/me", h.GetMe())
 }

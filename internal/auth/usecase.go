@@ -6,6 +6,6 @@ import (
 )
 
 type UseCase interface {
-	Login(ctx context.Context, user *models.User) (*models.UserWithToken, error)
-	GetUserByID(ctx context.Context, userID int) (*models.User, error)
+	Login(ctx context.Context, user *models.User) (*models.UserWithTokens, error)
+	GetUserByID(ctx context.Context, userID string) (*models.User, error)
 }

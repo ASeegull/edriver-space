@@ -3,9 +3,10 @@ package models
 import "errors"
 
 type User struct {
-	ID    int    `json:"id,omitempty"`
-	Login string `json:"login"`
+	Id       string    `json:"id"`
+	Login    string `json:"login"`
 	Password string `json:"password"`
+	Role     string `json:"role"`
 }
 
 func (u User) ComparePasswords(password string) error {
@@ -19,7 +20,7 @@ func (u *User) SanitizePassword() {
 	u.Password = ""
 }
 
-type UserWithToken struct {
-	User  *User
-	Token string
+type UserWithTokens struct {
+	User   *User
+	Tokens *JWTTokens
 }

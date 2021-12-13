@@ -21,11 +21,11 @@ redis:
   DB: 0
 
 cookie:
-  Name: session_id
-  MaxAge: 86400
+  Name: refreshToken
+  Expire: 43200
   Secure: false
   HttpOnly: true
 
-session:
-  Name: session_id
-  Expire: 3600
+tokens:
+  RefreshTokenTTL: 43200
+  AccessTokenTTL: 10

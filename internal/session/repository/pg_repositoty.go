@@ -3,14 +3,15 @@ package repository
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/ASeegull/edriver-space/internal/models"
 	"github.com/ASeegull/edriver-space/internal/session"
 	"github.com/go-redis/redis/v8"
-	"github.com/google/uuid"
 	"time"
 )
 
-const basePrefix = "api-session:"
+const basePrefix = "refresh-token:"
+
 type sessionRepo struct {
 	redisClient *redis.Client
 }
@@ -19,38 +20,40 @@ func NewSessionRepo(redisClient *redis.Client) session.SessRepository {
 	return &sessionRepo{redisClient: redisClient}
 }
 
-func (r sessionRepo) CreateSession(ctx context.Context, sess *models.Session, expire int) (string, error) {
-	sess.SessionID = uuid.New().String()
+func (r sessionRepo) CreateSession(ctx context.Context, userId string, refreshToken string, ttl time.Duration) error {
+	//rsBytes, err := json.Marshal(&rs)
+	//if err != nil {
+	//	return err
+	//}
 
-	sessBytes, err := json.Marshal(&sess)
-	if err != nil {
-		return "", err
+	if err := r.redisClient.Set(ctx, KeyWithPrefix(refreshToken), []byte(userId), ttl).Err(); err != nil {
+		return err
 	}
 
-	if err := r.redisClient.Set(ctx, sess.SessionID, sessBytes, time.Second*time.Duration(expire)).Err(); err != nil {
-		return "", err
-	}
-
-	return sess.SessionID, nil
+	return nil
 }
 
-func (r sessionRepo) GetSessionByID(ctx context.Context, sessionID string) (*models.Session, error) {
+func (r sessionRepo) GetSessionByID(ctx context.Context, sessionId string) (*models.RefreshSession, error) {
 
-	sessBytes, err := r.redisClient.Get(ctx, sessionID).Bytes()
+	sessBytes, err := r.redisClient.Get(ctx, KeyWithPrefix(sessionId)).Bytes()
 	if err != nil {
 		return nil, err
 	}
 
-	sess := &models.Session{}
+	sess := &models.RefreshSession{}
 	if err := json.Unmarshal(sessBytes, &sess); err != nil {
 		return nil, err
 	}
 	return sess, nil
 }
 
-func (r sessionRepo) DeleteByID(ctx context.Context, sessionID string) error {
-	if err := r.redisClient.Del(ctx, sessionID).Err(); err != nil {
+func (r sessionRepo) DeleteByID(ctx context.Context, sessionId string) error {
+	if err := r.redisClient.Del(ctx, KeyWithPrefix(sessionId)).Err(); err != nil {
 		return err
 	}
 	return nil
+}
+
+func KeyWithPrefix(id string) string {
+	return fmt.Sprintf("%s %s", basePrefix, id)
 }

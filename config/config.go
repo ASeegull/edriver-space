@@ -12,7 +12,7 @@ type Config struct {
 	Postgres PostgresConfig
 	Redis    RedisConfig
 	Cookie   Cookie
-	Session  Session
+	Tokens  Tokens
 }
 
 type ServerConfig struct {
@@ -42,14 +42,14 @@ type RedisConfig struct {
 
 type Cookie struct {
 	Name     string
-	MaxAge   int
+	Expire   int
 	Secure   bool
 	HTTPOnly bool
 }
 
-type Session struct {
-	Name   string
-	Expire int
+type Tokens struct {
+	AccessTokenTTL  int
+	RefreshTokenTTL int
 }
 
 //LoadConfig - Load config file from given path
