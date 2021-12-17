@@ -1,0 +1,27 @@
+server:
+  Port: :5050
+
+postgres:
+  PostgresqlHost: localhost
+  PostgresqlPort: 5432
+  PostgresqlUser: postgres
+  PostgresqlPassword: postgres
+  PostgresqlDbname: edriver
+  PostgresqlSslmode: disable
+  PostgresqlDriver: postgres
+
+redis:
+  RedisAddr: localhost:6379
+  Password: ""
+  DB: 0
+
+cookie:
+  Name: refreshToken
+  MaxAge: 43200
+  Path: /
+  Secure: false
+  HttpOnly: true
+
+tokensTTL:
+  Access: 15
+  Refresh: 43200
