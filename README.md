@@ -1,5 +1,10 @@
 # eDriver Space
 
+[![Lint](https://github.com/ASeegull/edriver-space/actions/workflows/lint.yml/badge.svg)](https://github.com/ASeegull/edriver-space/actions/workflows/lint.yml)
+[![Unit tests](https://github.com/ASeegull/edriver-space/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/ASeegull/edriver-space/actions/workflows/unit-tests.yml)
+[![Go Report Card](https://goreportcard.com/badge/ASeegull/edriver-space)](https://goreportcard.com/report/ASeegull/edriver-space)
+[![Coverage Status](https://coveralls.io/repos/github/ASeegull/edriver-space/badge.svg?branch=master)](https://coveralls.io/github/ASeegull/edriver-space?branch=master)
+
 ![Edit diagram](docs/images/e-driver.drawio.svg)
 
 ### Recommended workspace layout
