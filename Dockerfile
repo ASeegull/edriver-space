@@ -3,8 +3,17 @@ FROM golang:1.17-alpine as builder
 
 WORKDIR /src
 
-COPY cmd/ cmd/
+COPY go.mod go.mod
+COPY go.sum go.sum
 COPY vendor/ vendor/
+
+COPY cmd/ cmd/
+COPY api/ api/
+COPY config/ config/
+COPY logger/ logger/
+COPY migrations/ migrations/
+COPY model/ model/
+COPY storage/ storage/
 
 # build stage
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -o app cmd/app/main.go
