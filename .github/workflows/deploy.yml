@@ -7,6 +7,7 @@ on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [ master ]
+  workflow_dispatch:
 
 jobs:
   
@@ -26,7 +27,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ap-south-1
+        aws-region: us-east-1
 
     - name: Login to Amazon ECR
       id: login-ecr
@@ -39,4 +40,4 @@ jobs:
         IMAGE_TAG: develop
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
