@@ -51,12 +51,7 @@ func (h *AuthHandlers) SignIn() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, err.Error())
 		}
 
-		c.SetCookie(&http.Cookie{
-			Name:   h.cfg.Cookie.Name,
-			Value:  tokens.RefreshToken,
-			Path:   h.cfg.Cookie.Path,
-			MaxAge: h.cfg.Cookie.MaxAge * 60,
-		})
+		c.SetCookie(h.createCookie(tokens.RefreshToken))
 
 		return c.JSON(http.StatusOK, tokenResponse{
 			AccessToken:  tokens.AccessToken,
@@ -86,10 +81,7 @@ func (h *AuthHandlers) SignOut() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, err.Error())
 		}
 
-		c.SetCookie(&http.Cookie{
-			Name:   h.cfg.Cookie.Name,
-			MaxAge: -1,
-		})
+		c.SetCookie(h.deleteCookie())
 
 		return c.JSON(http.StatusOK, "signOut")
 	}
@@ -111,16 +103,33 @@ func (h *AuthHandlers) RefreshTokens() echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, err.Error())
 		}
 
-		c.SetCookie(&http.Cookie{
-			Name:   h.cfg.Cookie.Name,
-			Value:  tokens.RefreshToken,
-			Path:   h.cfg.Cookie.Path,
-			MaxAge: h.cfg.Cookie.MaxAge * 60,
-		})
+		c.SetCookie(h.createCookie(tokens.RefreshToken))
 
 		return c.JSON(http.StatusOK, tokenResponse{
 			AccessToken:  tokens.AccessToken,
 			RefreshToken: tokens.RefreshToken,
 		})
+	}
+}
+
+func (h *AuthHandlers) createCookie(refreshToken string) *http.Cookie {
+	return &http.Cookie{
+		Name:     h.cfg.Cookie.Name,
+		Value:    refreshToken,
+		MaxAge:   h.cfg.Cookie.MaxAge * 60,
+		Path:     h.cfg.Cookie.Path,
+		HttpOnly: h.cfg.Cookie.HTTPOnly,
+		Secure:   h.cfg.Cookie.Secure,
+	}
+}
+
+func (h *AuthHandlers) deleteCookie() *http.Cookie {
+	return &http.Cookie{
+		Name:     h.cfg.Cookie.Name,
+		Value:    "",
+		MaxAge:   -1,
+		Path:     h.cfg.Cookie.Path,
+		HttpOnly: h.cfg.Cookie.HTTPOnly,
+		Secure:   h.cfg.Cookie.Secure,
 	}
 }
