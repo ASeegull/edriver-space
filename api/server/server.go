@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/ASeegull/edriver-space/api/server/middlewares"
 	"github.com/ASeegull/edriver-space/model"
 	"github.com/labstack/echo/v4"
 	"net/http"
@@ -29,19 +30,25 @@ func (s *Server) routes() {
 	s.GET("/", s.hello())             // Home
 	s.GET("/Version", s.getVersion()) // Get project version
 
+	// Create custom middleware for authentication
+	var auth middlewares.Authenticator = middlewares.NewCustomMiddleware()
+
+	user := s.Group("/user", auth.JWTAuthentication("police"))
+	car := s.Group("/car", auth.JWTAuthentication("ParkingManager"))
+
 	// Users CRUD
-	s.GET("/Users", s.getUsers())         // Get all users
-	s.GET("/User/:id", s.getUser())       // Get user by id
-	s.POST("/User", s.createUser())       // Create new user
-	s.PATCH("/User/:id", s.updateUser())  // Update user data
-	s.DELETE("/User/:id", s.deleteUser()) // Delete user
+	user.GET("", s.getUsers())          // Get all users
+	user.GET("/:id", s.getUser())       // Get user by id
+	user.POST("", s.createUser())       // Create new user
+	user.PATCH("/:id", s.updateUser())  // Update user data
+	user.DELETE("/:id", s.deleteUser()) // Delete user
 
 	// Cars CRUD
-	s.GET("/Cars", s.getCars())         // Get all cars
-	s.GET("/Car/:id", s.getCar())       // Get car by id
-	s.POST("/Car", s.createCar())       // Create new car
-	s.PATCH("/Car/:id", s.updateCar())  // Update car data
-	s.DELETE("/Car/:id", s.deleteCar()) // Delete car
+	car.GET("", s.getCars())          // Get all cars
+	car.GET("/:id", s.getCar())       // Get car by id
+	car.POST("", s.createCar())       // Create new car
+	car.PATCH("/:id", s.updateCar())  // Update car data
+	car.DELETE("/:id", s.deleteCar()) // Delete car
 }
 
 // getVersion returns current version of the app
