@@ -23,7 +23,7 @@ func (s *Server) MapHandlers(e *echo.Echo) error {
 	authGroup := v1.Group("/auth")
 	// auth routes
 	authGroup.POST("/sign-in", handlers.Auth.SignIn())
-	authGroup.GET("/sign-out", handlers.Auth.SignOut())
+	authGroup.POST("/sign-out", handlers.Auth.SignOut())
 	authGroup.POST("/sign-up", handlers.Auth.SignUp())
 
 	authGroup.GET("/refresh-tokens", handlers.Auth.RefreshTokens())
