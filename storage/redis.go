@@ -6,14 +6,9 @@ import (
 )
 
 func NewRedisClient(cfg *config.Config) *redis.Client {
-	redisHost := cfg.Redis.RedisAddr
-
-	if redisHost == "" {
-		redisHost = ":6379"
-	}
 
 	client := redis.NewClient(&redis.Options{
-		Addr:     redisHost,
+		Addr:     cfg.Redis.RedisHost,
 		Password: cfg.Redis.Password, // no password set
 		DB:       cfg.Redis.DB,       // use default DB
 	})

@@ -12,12 +12,11 @@ import (
 )
 
 func NewPostgresDB(cfg *config.Config) (*sql.DB, error) {
-	dsn := fmt.Sprintf("%s://%s:%s@%s:%s/%s?sslmode=%s",
+	dsn := fmt.Sprintf("%s://%s:%s@%s/%s?sslmode=%s",
 		cfg.Postgres.PostgresqlDriver,
 		cfg.Postgres.PostgresqlUser,
 		cfg.Postgres.PostgresqlPassword,
 		cfg.Postgres.PostgresqlHost,
-		cfg.Postgres.PostgresqlPort,
 		cfg.Postgres.PostgresqlDbname,
 		cfg.Postgres.PostgresqlSSLMode)
 
