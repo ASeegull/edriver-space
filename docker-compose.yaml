@@ -2,14 +2,20 @@ version: '3.5'
 
 services:
     app:
-        image: edriverapp:develop
-        networks:
-            - internal
+        container_name: app
+        build:
+            context: .
+            dockerfile: Dockerfile
         ports:
             - "5050:5050"
         env_file:
             - ./env/docker/app.env
-
+        restart: unless-stopped
+        depends_on:
+          - redis
+          - postgres
+        networks:
+          - internal
 
     # webapp:
         # image: edriverwebapp:develop
@@ -22,14 +28,34 @@ services:
 
     postgres:
         image: postgres:14-alpine
-        networks:
-            - internal
+        container_name: postgres
         ports:
             - "5432:5432"
         env_file:
             - ./env/docker/postgres.env
-        volume:
-            - ./var/postgres/data:var/lib/postgresql/data
-            - ./env/postgres/env.sql:docker-entrypoint-initdb.d/env.sql
+        volumes:
+            - ./var/postgres/data:/var/lib/postgresql/data
+            - ./env/postgres/env.sql:/docker-entrypoint-initdb.d/env.sql
+        restart: always
+        networks:
+          - internal
         # uncomment to debug query
         # command:  postgres -c 'log_statement=all'
+
+    redis:
+        image: redis:6.2.6-alpine
+        container_name: redis
+        command: redis-server
+        ports:
+            - "6379:6379"
+        env_file:
+          - ./env/docker/redis.env
+        volumes:
+            - ./var/redis/data:/data
+        restart: always
+        networks:
+            - internal
+
+networks:
+    internal:
+        driver: bridge
