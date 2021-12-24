@@ -20,3 +20,6 @@ run:
 start:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -o app cmd/app/main.go
 	docker compose up -d --build
+
+stop:
+	docker compose stop
