@@ -2,8 +2,7 @@ server:
   Port: :5050
 
 postgres:
-  PostgresqlHost: localhost
-  PostgresqlPort: 5432
+  PostgresqlHost: "" # from env variables
   PostgresqlUser: postgres
   PostgresqlPassword: postgres
   PostgresqlDbname: edriver
@@ -11,7 +10,7 @@ postgres:
   PostgresqlDriver: postgres
 
 redis:
-  RedisAddr: localhost:6379
+  RedisHost: "" # from env variables
   Password: ""
   DB: 0
 
