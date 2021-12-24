@@ -7,6 +7,7 @@ import (
 	"github.com/ASeegull/edriver-space/models"
 	"github.com/ASeegull/edriver-space/pkg/auth"
 	"github.com/ASeegull/edriver-space/repository"
+	"golang.org/x/sync/errgroup"
 	"time"
 )
 
@@ -81,16 +82,24 @@ func (a *AuthService) createSession(ctx context.Context, userId string) (Tokens,
 		err error
 	)
 
-	accessTokenTTL := time.Duration(a.cfg.TokensTTL.Access) * time.Minute
+	g := new(errgroup.Group)
 
-	res.AccessToken, err = a.tokenManager.NewJWT(userId, "user", accessTokenTTL)
-	if err != nil {
-		return Tokens{}, nil
-	}
+	g.Go(func() error {
+		accessTokenTTL := time.Duration(a.cfg.TokensTTL.Access) * time.Minute
 
-	res.RefreshToken, err = a.tokenManager.NewRefreshToken()
-	if err != nil {
-		return Tokens{}, nil
+		res.AccessToken, err = a.tokenManager.NewJWT(userId, "user", accessTokenTTL)
+
+		return err
+	})
+
+	g.Go(func() error {
+		res.RefreshToken, err = a.tokenManager.NewRefreshToken()
+
+		return err
+	})
+
+	if err := g.Wait(); err != nil {
+		return Tokens{}, err
 	}
 
 	refreshTokenTTL := time.Duration(a.cfg.TokensTTL.Refresh) * time.Minute
