@@ -5,7 +5,7 @@ services:
         container_name: app
         build:
             context: .
-            dockerfile: Dockerfile
+            dockerfile: dev.Dockerfile
         ports:
             - "5050:5050"
         env_file:
