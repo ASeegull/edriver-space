@@ -10,7 +10,7 @@ func init() {
 }
 
 func UpUsersFines(tx *sql.Tx) error {
-	query := `CREATE TABLE IF NOT EXISTS users_fines
+	query := `CREATE TABLE IF NOT EXISTS drivers_fines
 		(
 			licence_number              VARCHAR(55)  NOT NULL,
 			date_and_time               DATE         NOT NULL,
@@ -28,7 +28,7 @@ func UpUsersFines(tx *sql.Tx) error {
 }
 
 func DownUsersFines(tx *sql.Tx) error {
-	query := `DROP TABLE IF EXISTS users_fines;`
+	query := `DROP TABLE IF EXISTS drivers_fines;`
 	_, err := tx.Exec(query)
 	if err != nil {
 		return err

@@ -6,11 +6,11 @@ import (
 )
 
 func init() {
-	goose.AddMigration(UpUsers, DownUsers)
+	goose.AddMigration(UpDrivers, DownDrivers)
 }
 
-func UpUsers(tx *sql.Tx) error {
-	query := `CREATE TABLE IF NOT EXISTS users
+func UpDrivers(tx *sql.Tx) error {
+	query := `CREATE TABLE IF NOT EXISTS drivers
 		(
 			id                    SERIAL PRIMARY KEY,
 			full_name             VARCHAR(255)       NOT NULL,
@@ -32,8 +32,8 @@ func UpUsers(tx *sql.Tx) error {
 	return nil
 }
 
-func DownUsers(tx *sql.Tx) error {
-	query := `DROP TABLE IF EXISTS users;`
+func DownDrivers(tx *sql.Tx) error {
+	query := `DROP TABLE IF EXISTS drivers;`
 	_, err := tx.Exec(query)
 	if err != nil {
 		return err
