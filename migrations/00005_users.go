@@ -12,10 +12,11 @@ func init() {
 func UpUsers(tx *sql.Tx) error {
 	query := `CREATE TABLE IF NOT EXISTS users
 		(
-			id                    	SERIAL PRIMARY KEY,
-			email            		VARCHAR(255) 		NOT NULL,
-			password         		DATE               	NOT NULL,
-			driver_licence_number   VARCHAR(55) UNIQUE
+			id                    	SERIAL 			PRIMARY KEY,
+			email            		VARCHAR(255) 	NOT NULL,
+			password         		VARCHAR(64)   	NOT NULL,
+			role 					VARCHAR(30) 	DEFAULT 'user',
+			driver_licence_number   VARCHAR(55) 	DEFAULT ''
 		);`
 	_, err := tx.Exec(query)
 	if err != nil {

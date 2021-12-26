@@ -18,7 +18,7 @@ func UpUsersFines(tx *sql.Tx) error {
 			file_law_article            VARCHAR(30)  NOT NULL,
 			price                       INT          NOT NULL,
 			vehicle_registration_number VARCHAR(25)  NOT NULL,
-			FOREIGN KEY (licence_number) REFERENCES users (licence_number)
+			FOREIGN KEY (licence_number) REFERENCES drivers (licence_number)
 		);`
 	_, err := tx.Exec(query)
 	if err != nil {
