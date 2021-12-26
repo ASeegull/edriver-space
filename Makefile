@@ -23,3 +23,7 @@ start:
 
 stop:
 	docker compose stop
+
+restart:
+	make stop
+	make start
