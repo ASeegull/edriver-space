@@ -20,7 +20,6 @@ type ServerConfig struct {
 
 type PostgresConfig struct {
 	PostgresqlHost     string
-	PostgresqlPort     string
 	PostgresqlUser     string
 	PostgresqlPassword string
 	PostgresqlDbname   string
@@ -29,7 +28,7 @@ type PostgresConfig struct {
 }
 
 type RedisConfig struct {
-	RedisAddr string
+	RedisHost string
 	Password  string
 	DB        int
 }
@@ -73,6 +72,10 @@ func ParseConfig(v *viper.Viper) (*Config, error) {
 		log.Printf("unable to decode into struct, %v", err)
 		return nil, err
 	}
+
+	// get from env
+	c.Redis.RedisHost = v.Get("REDIS_HOST").(string)
+	c.Postgres.PostgresqlHost = v.Get("POSTGRES_HOST").(string)
 
 	return &c, nil
 }
