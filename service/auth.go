@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/ASeegull/edriver-space/config"
-	"github.com/ASeegull/edriver-space/models"
+	"github.com/ASeegull/edriver-space/model"
 	"github.com/ASeegull/edriver-space/pkg/auth"
 	"github.com/ASeegull/edriver-space/repository"
 	"golang.org/x/sync/errgroup"
@@ -45,8 +45,8 @@ func NewAuthService(repos *repository.Repositories, tokenManager auth.TokenManag
 func (a *AuthService) SignIn(ctx context.Context, input UserSignInInput) (Tokens, error) {
 	user, err := a.authRepos.GetUserByCredentials(ctx, input.Login, input.Password)
 	if err != nil {
-		if errors.Is(err, models.ErrUserNotFound) {
-			return Tokens{}, models.ErrUserNotFound
+		if errors.Is(err, model.ErrUserNotFound) {
+			return Tokens{}, model.ErrUserNotFound
 		}
 
 		return Tokens{}, err
@@ -71,7 +71,7 @@ func (a *AuthService) DeleteSession(ctx context.Context, sessionId string) error
 	return a.sessionRepos.DeleteSession(ctx, sessionId)
 }
 
-func (a *AuthService) GetUserById(ctx context.Context, userId string) (*models.User, error) {
+func (a *AuthService) GetUserById(ctx context.Context, userId string) (*model.User, error) {
 
 	return a.authRepos.GetUserById(ctx, userId)
 }

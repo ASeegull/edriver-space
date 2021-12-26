@@ -3,7 +3,7 @@ package handler
 import (
 	"errors"
 	"github.com/ASeegull/edriver-space/config"
-	"github.com/ASeegull/edriver-space/models"
+	"github.com/ASeegull/edriver-space/model"
 	"github.com/ASeegull/edriver-space/service"
 	"github.com/labstack/echo/v4"
 	"net/http"
@@ -45,7 +45,7 @@ func (h *AuthHandlers) SignIn() echo.HandlerFunc {
 		})
 
 		if err != nil {
-			if errors.Is(err, models.ErrUserNotFound) {
+			if errors.Is(err, model.ErrUserNotFound) {
 				return c.JSON(http.StatusBadRequest, err.Error())
 			}
 			return c.JSON(http.StatusInternalServerError, err.Error())

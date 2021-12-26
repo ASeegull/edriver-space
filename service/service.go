@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"github.com/ASeegull/edriver-space/config"
-	"github.com/ASeegull/edriver-space/models"
+	"github.com/ASeegull/edriver-space/model"
 	"github.com/ASeegull/edriver-space/pkg/auth"
 	"github.com/ASeegull/edriver-space/repository"
 )
@@ -11,7 +11,7 @@ import (
 type Auth interface {
 	SignIn(ctx context.Context, user UserSignInInput) (Tokens, error)
 	RefreshTokens(ctx context.Context, sessionId string) (Tokens, error)
-	GetUserById(ctx context.Context, userId string) (*models.User, error)
+	GetUserById(ctx context.Context, userId string) (*model.User, error)
 	DeleteSession(ctx context.Context, sessionId string) error
 }
 

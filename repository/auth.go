@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"github.com/ASeegull/edriver-space/models"
+	"github.com/ASeegull/edriver-space/model"
 )
 
 type AuthRepos struct {
@@ -16,24 +16,24 @@ func NewAuthRepos(db *sql.DB) *AuthRepos {
 	}
 }
 
-func (a *AuthRepos) GetUserByCredentials(ctx context.Context, login, password string) (*models.User, error) {
+func (a *AuthRepos) GetUserByCredentials(ctx context.Context, login, password string) (*model.User, error) {
 
 	return a.getUser(ctx, "SELECT * FROM accounts WHERE email = $1 AND password = $2", login, password)
 }
 
-func (a *AuthRepos) GetUserById(ctx context.Context, userId string) (*models.User, error) {
+func (a *AuthRepos) GetUserById(ctx context.Context, userId string) (*model.User, error) {
 
 	return a.getUser(ctx, "SELECT * FROM accounts WHERE id = $1", userId)
 }
 
-func (a *AuthRepos) getUser(ctx context.Context, query string, args ...interface{}) (*models.User, error) {
-	user := &models.User{}
+func (a *AuthRepos) getUser(ctx context.Context, query string, args ...interface{}) (*model.User, error) {
+	user := &model.User{}
 
 	if err := a.db.QueryRowContext(ctx, query, args...).Scan(
 		&user.Id, &user.Email, &user.Password, &user.Role,
 	); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, models.ErrUserNotFound
+			return nil, model.ErrUserNotFound
 		}
 		return user, err
 	}

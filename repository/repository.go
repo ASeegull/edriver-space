@@ -3,14 +3,14 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"github.com/ASeegull/edriver-space/models"
+	"github.com/ASeegull/edriver-space/model"
 	"github.com/go-redis/redis/v8"
 	"time"
 )
 
 type Auth interface {
-	GetUserByCredentials(ctx context.Context, login, password string) (*models.User, error)
-	GetUserById(ctx context.Context, userId string) (*models.User, error)
+	GetUserByCredentials(ctx context.Context, login, password string) (*model.User, error)
+	GetUserById(ctx context.Context, userId string) (*model.User, error)
 }
 
 type Sessions interface {

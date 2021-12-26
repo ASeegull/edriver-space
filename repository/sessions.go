@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
-	"github.com/ASeegull/edriver-space/models"
+	"github.com/ASeegull/edriver-space/model"
 	"github.com/go-redis/redis/v8"
 	"time"
 )
@@ -34,7 +34,7 @@ func (s *SessionsRepos) GetSessionById(ctx context.Context, sessionId string) (*
 	userId, err := s.client.Get(ctx, s.keyWithPrefix(sessionId)).Result()
 	if err != nil {
 		if err == redis.Nil {
-			return nil, models.ErrSessionNotFound
+			return nil, model.ErrSessionNotFound
 		}
 
 		return nil, err
