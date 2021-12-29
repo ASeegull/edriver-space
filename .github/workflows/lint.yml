@@ -1,0 +1,22 @@
+name: Lint
+
+on: push
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17
+
+    - name: Install Linters
+      run: go install honnef.co/go/tools/cmd/staticcheck@v0.2.2
+
+    - name: Lint
+      run: |
+        export PATH=${PATH}:`go env GOPATH`/bin
+        make lint

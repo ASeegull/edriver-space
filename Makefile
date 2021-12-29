@@ -27,3 +27,10 @@ stop:
 restart:
 	make stop
 	make start
+
+test:
+	go test ./...
+
+test-coverage:
+	- rm -rf *.out  # Remove all coverage files if exists
+	go test -race -failfast -tags=integration -coverprofile=coverage-all.out ./...

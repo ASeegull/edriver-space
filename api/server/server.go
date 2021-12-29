@@ -10,6 +10,7 @@ type Server struct {
 	*echo.Echo
 	Users []model.User
 	Cars  []model.Car
+	Data  model.Data
 }
 
 // NewServer starts new Server
@@ -18,16 +19,25 @@ func NewServer() *Server {
 		Echo:  echo.New(),
 		Users: []model.User{},
 		Cars:  []model.Car{},
+		Data:  model.Data{},
 	}
 	// All possible routes
-	s.routes()
+	s.setupRoutes()
 	return s
 }
 
-// routes stores all possible routes
-func (s *Server) routes() {
+// setupRoutes handles all server routing
+func (s *Server) setupRoutes() {
 	s.GET("/", s.hello())             // Home
-	s.GET("/Version", s.getVersion()) // Get project version
+	s.GET("/version", s.getVersion()) // Get project version
+
+	// Fines group
+	fines := s.Group("/fines")
+	fines.POST("/uploadXML", s.uploadXMLFines())     // Upload parking fines data from xml file
+	fines.POST("/uploadExcel", s.uploadExcelFines()) // Upload Excel file with fines
+	fines.GET("", s.getParkingFines())               // Get all parking fines
+	fines.GET("/:id", s.getParkingFine())            // Get parking fine by id
+	fines.DELETE("/:id", s.deleteParkingFine())      // Remove parking fine by id
 
 	// Users CRUD
 	s.GET("/Users", s.getUsers())         // Get all users
@@ -52,6 +62,7 @@ func (s *Server) getVersion() echo.HandlerFunc {
 	}
 }
 
+// hello greets developers group
 func (s *Server) hello() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		hi := "Hello Lv-644.Go!"

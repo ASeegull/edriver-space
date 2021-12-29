@@ -15,6 +15,7 @@ func main() {
 	if err != nil {
 		logger.LogFatal(err)
 	}
+
 	cfg, err := config.ParseConfig(cfgViper)
 	if err != nil {
 		logger.LogFatal(err)
