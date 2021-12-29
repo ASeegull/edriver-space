@@ -109,6 +109,7 @@ func (s *Server) uploadExcelFines() echo.HandlerFunc {
 			IssueTimeCol
 			CarIDCol
 			CostCol
+			URLCol
 		)
 
 		// Go through all sheets and collect all data
@@ -122,7 +123,7 @@ func (s *Server) uploadExcelFines() echo.HandlerFunc {
 			// Go through all rows
 			for _, row := range rows {
 				// Skip the first row with designation info
-				if row[0] == "ID" || row[0] == "Id" || row[0] == "id" || row[0] == "iD" {
+				if row[IDCol] == "ID" || row[IDCol] == "Id" || row[IDCol] == "id" || row[IDCol] == "iD" {
 					continue
 				}
 				// Convert fine cost from string to int
@@ -132,7 +133,7 @@ func (s *Server) uploadExcelFines() echo.HandlerFunc {
 					return ctx.String(http.StatusInternalServerError, "Error converting string to int.")
 				}
 				// Create new parking fine
-				parkingFine := model.MakeParkingFine(row[IDCol], row[IssueTimeCol], row[CarIDCol], cost)
+				parkingFine := model.MakeParkingFine(row[IDCol], row[IssueTimeCol], row[CarIDCol], cost, row[URLCol])
 
 				// Add parking fine to the slice
 				parkingFines = append(parkingFines, parkingFine)

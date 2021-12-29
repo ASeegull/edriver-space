@@ -12,8 +12,9 @@ type ParkingFine struct {
 	IssueTime string `xml:"issueTime" json:"issue_time"`
 	CarID     string `xml:"carID" json:"car_id"`
 	Cost      int    `xml:"cost" json:"cost"`
+	PhotoURL  string `xml:"photo_url" json:"photo_url"`
 }
 
-func MakeParkingFine(ID, IssueTime, CarID string, Cost int) ParkingFine {
-	return ParkingFine{ID: ID, IssueTime: IssueTime, CarID: CarID, Cost: Cost}
+func MakeParkingFine(ID, IssueTime, CarID string, Cost int, PhotoURL string) ParkingFine {
+	return ParkingFine{ID: ID, IssueTime: IssueTime, CarID: CarID, Cost: Cost, PhotoURL: PhotoURL}
 }
