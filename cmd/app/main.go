@@ -7,10 +7,11 @@ import (
 	"github.com/ASeegull/edriver-space/server"
 	"github.com/ASeegull/edriver-space/storage"
 	"github.com/pressly/goose/v3"
+	"os"
 )
 
 func main() {
-	cfgViper, err := config.LoadConfig("./config/config-local")
+	cfgViper, err := config.LoadConfig(os.Getenv("CONFIG_PATH"))
 	if err != nil {
 		logger.LogFatal(err)
 	}
