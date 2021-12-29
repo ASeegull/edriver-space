@@ -17,7 +17,6 @@ type Auth interface {
 
 type Services struct {
 	Auth         Auth
-	TokenManager auth.TokenManager
 }
 
 func NewServices(repos *repository.Repositories, tokenManager auth.TokenManager, cfg *config.Config) *Services {
