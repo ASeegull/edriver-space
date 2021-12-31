@@ -5,6 +5,7 @@ import (
 	"github.com/ASeegull/edriver-space/config"
 	"github.com/ASeegull/edriver-space/model"
 	"github.com/ASeegull/edriver-space/pkg/auth"
+	"github.com/ASeegull/edriver-space/pkg/hash"
 	"github.com/ASeegull/edriver-space/repository"
 )
 
@@ -16,11 +17,11 @@ type Auth interface {
 }
 
 type Services struct {
-	Auth         Auth
+	Auth Auth
 }
 
-func NewServices(repos *repository.Repositories, tokenManager auth.TokenManager, cfg *config.Config) *Services {
+func NewServices(repos *repository.Repositories, tokenManager auth.TokenManager, hasher hash.PasswordHasher, cfg *config.Config) *Services {
 	return &Services{
-		Auth: NewAuthService(repos, tokenManager, cfg),
+		Auth: NewAuthService(repos, tokenManager, hasher, cfg),
 	}
 }

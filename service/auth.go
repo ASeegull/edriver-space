@@ -6,6 +6,7 @@ import (
 	"github.com/ASeegull/edriver-space/config"
 	"github.com/ASeegull/edriver-space/model"
 	"github.com/ASeegull/edriver-space/pkg/auth"
+	"github.com/ASeegull/edriver-space/pkg/hash"
 	"github.com/ASeegull/edriver-space/repository"
 	"golang.org/x/sync/errgroup"
 	"time"
@@ -30,20 +31,27 @@ type AuthService struct {
 	authRepos    repository.Auth
 	sessionRepos repository.Sessions
 	tokenManager auth.TokenManager
+	hasher       hash.PasswordHasher
 	cfg          *config.Config
 }
 
-func NewAuthService(repos *repository.Repositories, tokenManager auth.TokenManager, cfg *config.Config) *AuthService {
+func NewAuthService(repos *repository.Repositories, tokenManager auth.TokenManager, hasher hash.PasswordHasher, cfg *config.Config) *AuthService {
 	return &AuthService{
 		authRepos:    repos.Auth,
 		sessionRepos: repos.Sessions,
 		tokenManager: tokenManager,
+		hasher:       hasher,
 		cfg:          cfg,
 	}
 }
 
 func (a *AuthService) SignIn(ctx context.Context, input UserSignInInput) (Tokens, error) {
-	user, err := a.authRepos.GetUserByCredentials(ctx, input.Login, input.Password)
+	hashPassword, err := a.hasher.Hash(input.Password)
+	if err != nil {
+		return Tokens{}, err
+	}
+
+	user, err := a.authRepos.GetUserByCredentials(ctx, input.Login, hashPassword)
 	if err != nil {
 		if errors.Is(err, model.ErrUserNotFound) {
 			return Tokens{}, model.ErrUserNotFound
