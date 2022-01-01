@@ -19,14 +19,23 @@ type Sessions interface {
 	DeleteSession(ctx context.Context, sessionId string) error
 }
 
+type Uploader interface {
+	GetFine(ctx context.Context, id string) (*model.ParkingFine, error)
+	GetFines(ctx context.Context) ([]model.ParkingFine, error)
+	AddFine(ctx context.Context, fine model.ParkingFine) error
+	DeleteFine(ctx context.Context, id string) error
+}
+
 type Repositories struct {
 	Auth     Auth
 	Sessions Sessions
+	Uploader Uploader
 }
 
 func NewRepositories(postgres *sql.DB, redis *redis.Client) *Repositories {
 	return &Repositories{
 		Auth:     NewAuthRepos(postgres),
 		Sessions: NewSessionsRepos(redis),
+		Uploader: NewUploadRepos(postgres),
 	}
 }
