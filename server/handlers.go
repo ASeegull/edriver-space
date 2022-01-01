@@ -34,5 +34,11 @@ func (s *Server) MapHandlers(e *echo.Echo) error {
 
 	authGroup.GET("/refresh-tokens", handlers.Auth.RefreshTokens())
 
+	// upload routes
+	uploadGroup := v1.Group("/upload")
+
+	uploadGroup.POST("/XML", handlers.Upload.UploadXMLFines()) // Upload XML fines data to the server
+	uploadGroup.POST("/Excel", handlers.Upload.UploadExcel())  // Upload Excel file with fines to the server
+
 	return nil
 }
