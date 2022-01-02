@@ -84,6 +84,19 @@ func (a *AuthService) GetUserById(ctx context.Context, userId string) (*model.Us
 	return a.authRepos.GetUserById(ctx, userId)
 }
 
+func (a *AuthService) SignUp(ctx context.Context, user UserSignUpInput) (Tokens, error) {
+	passwordHash, err := a.hasher.Hash(user.Password)
+	if err != nil {
+		return Tokens{}, err
+	}
+
+	userId, err := a.authRepos.CreateUser(ctx, user.Email, passwordHash)
+	if err != nil {
+		return Tokens{}, err
+	}
+	return a.createSession(ctx, userId)
+}
+
 func (a *AuthService) createSession(ctx context.Context, userId string) (Tokens, error) {
 	var (
 		res Tokens
