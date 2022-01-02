@@ -13,8 +13,8 @@ func UpUsers(tx *sql.Tx) error {
 	query := `CREATE TABLE IF NOT EXISTS users
 		(
 			id                    	SERIAL 			PRIMARY KEY,
-			email            		VARCHAR(255) 	NOT NULL,
-			password         		VARCHAR(72)   	NOT NULL,
+			email            		VARCHAR(255) 	UNIQUE 			NOT NULL,
+			password         		VARCHAR(72)   					NOT NULL,
 			role 					VARCHAR(30) 	DEFAULT 'user',
 			driver_licence_number   VARCHAR(55) 	DEFAULT ''
 		);`
