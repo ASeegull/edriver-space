@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/ASeegull/edriver-space/model"
+	"github.com/lib/pq"
 )
 
 type AuthRepos struct {
@@ -16,9 +17,9 @@ func NewAuthRepos(db *sql.DB) *AuthRepos {
 	}
 }
 
-func (a *AuthRepos) GetUserByCredentials(ctx context.Context, login, password string) (*model.User, error) {
+func (a *AuthRepos) GetUserByCredentials(ctx context.Context, email, password string) (*model.User, error) {
 
-	return a.getUser(ctx, "SELECT * FROM users WHERE email = $1 AND password = $2", login, password)
+	return a.getUser(ctx, "SELECT * FROM users WHERE email = $1 AND password = $2", email, password)
 }
 
 func (a *AuthRepos) GetUserById(ctx context.Context, userId string) (*model.User, error) {
@@ -26,11 +27,33 @@ func (a *AuthRepos) GetUserById(ctx context.Context, userId string) (*model.User
 	return a.getUser(ctx, "SELECT * FROM users WHERE id = $1", userId)
 }
 
+func (a *AuthRepos) CreateUser(ctx context.Context, newUser model.User) (string, error) {
+	_, err := a.db.ExecContext(ctx, "INSERT INTO users(firstname, lastname, email, password) VALUES ($1, $2, $3, $4)",
+		newUser.Firstname, newUser.Lastname, newUser.Email, newUser.Password)
+	if err != nil {
+		// convert to postgres error
+		if err, ok := err.(*pq.Error); ok {
+			// unique_violation
+			if err.Code == "23505" {
+				return "", model.ErrUserWithEmailExist
+			}
+		}
+		return "", err
+	}
+
+	var userId string
+
+	if err := a.db.QueryRowContext(ctx, "SELECT id FROM users WHERE email = $1", newUser.Email).Scan(&userId); err != nil {
+		return "", err
+	}
+	return userId, nil
+}
+
 func (a *AuthRepos) getUser(ctx context.Context, query string, args ...interface{}) (*model.User, error) {
 	user := &model.User{}
 
 	if err := a.db.QueryRowContext(ctx, query, args...).Scan(
-		&user.Id, &user.Email, &user.Password, &user.Role, &user.DriverLicenseNumber,
+		&user.Id, &user.Firstname, &user.Lastname, &user.Email, &user.Password, &user.Role, &user.DriverLicenseNumber,
 	); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, model.ErrUserNotFound

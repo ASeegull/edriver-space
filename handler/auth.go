@@ -40,7 +40,7 @@ func (h *AuthHandlers) SignIn() echo.HandlerFunc {
 		}
 
 		tokens, err := h.AuthService.SignIn(c.Request().Context(), service.UserSignInInput{
-			Login:    input.Email,
+			Email:    input.Email,
 			Password: input.Password,
 		})
 
@@ -60,9 +60,41 @@ func (h *AuthHandlers) SignIn() echo.HandlerFunc {
 	}
 }
 
+type signUpInput struct {
+	Firstname string `json:"firstname"`
+	Lastname  string `json:"lastname"`
+	Email     string `json:"email"`
+	Password  string `json:"password"`
+}
+
 func (h *AuthHandlers) SignUp() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		return c.JSON(http.StatusOK, "signUp")
+		var input signUpInput
+
+		if err := c.Bind(&input); err != nil {
+			return c.JSON(http.StatusBadRequest, "invalid input body")
+		}
+
+		tokens, err := h.AuthService.SignUp(c.Request().Context(), service.UserSignUpInput{
+			Firstname: input.Firstname,
+			Lastname:  input.Lastname,
+			Email:     input.Email,
+			Password:  input.Password,
+		})
+
+		if err != nil {
+			if errors.Is(err, model.ErrUserNotFound) {
+				return c.JSON(http.StatusBadRequest, err.Error())
+			}
+			return c.JSON(http.StatusInternalServerError, err.Error())
+		}
+
+		c.SetCookie(h.createCookie(tokens.RefreshToken))
+
+		return c.JSON(http.StatusOK, tokenResponse{
+			AccessToken:  tokens.AccessToken,
+			RefreshToken: tokens.RefreshToken,
+		})
 	}
 }
 

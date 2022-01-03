@@ -12,21 +12,6 @@ import (
 	"time"
 )
 
-type UserSignUpInput struct {
-	Email    string
-	Password string
-}
-
-type UserSignInInput struct {
-	Login    string
-	Password string
-}
-
-type Tokens struct {
-	AccessToken  string
-	RefreshToken string
-}
-
 type AuthService struct {
 	authRepos    repository.Auth
 	sessionRepos repository.Sessions
@@ -45,13 +30,30 @@ func NewAuthService(repos *repository.Repositories, tokenManager auth.TokenManag
 	}
 }
 
+type UserSignInInput struct {
+	Email    string
+	Password string
+}
+
+type Tokens struct {
+	AccessToken  string
+	RefreshToken string
+}
+
+type UserSignUpInput struct {
+	Firstname string
+	Lastname  string
+	Email     string
+	Password  string
+}
+
 func (a *AuthService) SignIn(ctx context.Context, input UserSignInInput) (Tokens, error) {
 	hashPassword, err := a.hasher.Hash(input.Password)
 	if err != nil {
 		return Tokens{}, err
 	}
 
-	user, err := a.authRepos.GetUserByCredentials(ctx, input.Login, hashPassword)
+	user, err := a.authRepos.GetUserByCredentials(ctx, input.Email, hashPassword)
 	if err != nil {
 		if errors.Is(err, model.ErrUserNotFound) {
 			return Tokens{}, model.ErrUserNotFound
@@ -82,6 +84,26 @@ func (a *AuthService) DeleteSession(ctx context.Context, sessionId string) error
 func (a *AuthService) GetUserById(ctx context.Context, userId string) (*model.User, error) {
 
 	return a.authRepos.GetUserById(ctx, userId)
+}
+
+func (a *AuthService) SignUp(ctx context.Context, user UserSignUpInput) (Tokens, error) {
+	passwordHash, err := a.hasher.Hash(user.Password)
+	if err != nil {
+		return Tokens{}, err
+	}
+
+	newUser := model.User{
+		Firstname: &user.Firstname,
+		Lastname:  &user.Lastname,
+		Email:     &user.Email,
+		Password:  &passwordHash,
+	}
+
+	userId, err := a.authRepos.CreateUser(ctx, newUser)
+	if err != nil {
+		return Tokens{}, err
+	}
+	return a.createSession(ctx, userId)
 }
 
 func (a *AuthService) createSession(ctx context.Context, userId string) (Tokens, error) {

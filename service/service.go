@@ -11,6 +11,7 @@ import (
 )
 
 type Auth interface {
+	SignUp(ctx context.Context, user UserSignUpInput) (Tokens, error)
 	SignIn(ctx context.Context, user UserSignInInput) (Tokens, error)
 	RefreshTokens(ctx context.Context, sessionId string) (Tokens, error)
 	GetUserById(ctx context.Context, userId string) (*model.User, error)
