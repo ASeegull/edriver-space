@@ -13,8 +13,10 @@ import (
 )
 
 type UserSignUpInput struct {
-	Email    string
-	Password string
+	Firstname string
+	Lastname  string
+	Email     string
+	Password  string
 }
 
 type UserSignInInput struct {
@@ -90,7 +92,14 @@ func (a *AuthService) SignUp(ctx context.Context, user UserSignUpInput) (Tokens,
 		return Tokens{}, err
 	}
 
-	userId, err := a.authRepos.CreateUser(ctx, user.Email, passwordHash)
+	newUser := model.User{
+		Firstname: &user.Firstname,
+		Lastname:  &user.Lastname,
+		Email:     &user.Email,
+		Password:  &passwordHash,
+	}
+
+	userId, err := a.authRepos.CreateUser(ctx, newUser)
 	if err != nil {
 		return Tokens{}, err
 	}

@@ -11,7 +11,7 @@ import (
 type Auth interface {
 	GetUserByCredentials(ctx context.Context, login, password string) (*model.User, error)
 	GetUserById(ctx context.Context, userId string) (*model.User, error)
-	CreateUser(ctx context.Context, email, password string) (string, error)
+	CreateUser(ctx context.Context, newUser model.User) (string, error)
 }
 
 type Sessions interface {

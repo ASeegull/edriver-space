@@ -60,22 +60,26 @@ func (h *AuthHandlers) SignIn() echo.HandlerFunc {
 	}
 }
 
-type SignUpInput struct {
-	Email    string
-	Password string
+type signUpInput struct {
+	Firstname string `json:"firstname"`
+	Lastname  string `json:"lastname"`
+	Email     string `json:"email"`
+	Password  string `json:"password"`
 }
 
 func (h *AuthHandlers) SignUp() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var input SignUpInput
+		var input signUpInput
 
 		if err := c.Bind(&input); err != nil {
 			return c.JSON(http.StatusBadRequest, "invalid input body")
 		}
 
 		tokens, err := h.AuthService.SignUp(c.Request().Context(), service.UserSignUpInput{
-			Email:    input.Email,
-			Password: input.Password,
+			Firstname: input.Firstname,
+			Lastname:  input.Lastname,
+			Email:     input.Email,
+			Password:  input.Password,
 		})
 
 		if err != nil {
