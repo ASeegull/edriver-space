@@ -40,7 +40,7 @@ func (h *AuthHandlers) SignIn() echo.HandlerFunc {
 		}
 
 		tokens, err := h.AuthService.SignIn(c.Request().Context(), service.UserSignInInput{
-			Login:    input.Email,
+			Email:    input.Email,
 			Password: input.Password,
 		})
 

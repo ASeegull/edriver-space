@@ -12,23 +12,6 @@ import (
 	"time"
 )
 
-type UserSignUpInput struct {
-	Firstname string
-	Lastname  string
-	Email     string
-	Password  string
-}
-
-type UserSignInInput struct {
-	Login    string
-	Password string
-}
-
-type Tokens struct {
-	AccessToken  string
-	RefreshToken string
-}
-
 type AuthService struct {
 	authRepos    repository.Auth
 	sessionRepos repository.Sessions
@@ -47,13 +30,30 @@ func NewAuthService(repos *repository.Repositories, tokenManager auth.TokenManag
 	}
 }
 
+type UserSignInInput struct {
+	Email    string
+	Password string
+}
+
+type Tokens struct {
+	AccessToken  string
+	RefreshToken string
+}
+
+type UserSignUpInput struct {
+	Firstname string
+	Lastname  string
+	Email     string
+	Password  string
+}
+
 func (a *AuthService) SignIn(ctx context.Context, input UserSignInInput) (Tokens, error) {
 	hashPassword, err := a.hasher.Hash(input.Password)
 	if err != nil {
 		return Tokens{}, err
 	}
 
-	user, err := a.authRepos.GetUserByCredentials(ctx, input.Login, hashPassword)
+	user, err := a.authRepos.GetUserByCredentials(ctx, input.Email, hashPassword)
 	if err != nil {
 		if errors.Is(err, model.ErrUserNotFound) {
 			return Tokens{}, model.ErrUserNotFound
