@@ -7,4 +7,5 @@ var (
 	ErrSessionNotFound    = errors.New("session doesn't exists")
 	ErrWrongFileType      = errors.New("wrong file type")
 	ErrUserWithEmailExist = errors.New("the user with such email is registered")
+  ErrJWTEmpty           = errors.New("JWT token has empty body")
 )
