@@ -8,15 +8,16 @@ import (
 	"github.com/ASeegull/edriver-space/repository"
 	"github.com/ASeegull/edriver-space/service"
 	"github.com/labstack/echo/v4"
+	"os"
 )
 
 func (s *Server) MapHandlers(e *echo.Echo) error {
 
-	tokenManager, err := auth.NewManager("secret_key")
+	tokenManager, err := auth.NewManager(os.Getenv("JWT_SECRET_KEY"))
 	if err != nil {
 		return err
 	}
-	hasher, err := hash.NewSHA256Hasher("salt")
+	hasher, err := hash.NewSHA256Hasher(os.Getenv("PASSWORD_SALT"))
 	if err != nil {
 		return err
 	}
