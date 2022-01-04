@@ -23,5 +23,4 @@ RUN chmod +x /usr/lib/edriver-space/app
 
 ENTRYPOINT [ "/usr/lib/edriver-space/app" ]
 
-USER app
 EXPOSE 5050
