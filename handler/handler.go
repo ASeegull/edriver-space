@@ -16,6 +16,7 @@ type Users interface {
 
 // Uploader provides methods to upload fines on the server
 type Uploader interface {
+	InitUploaderRoutes(e *echo.Group)
 	UploadXMLFines() echo.HandlerFunc
 	UploadExcel() echo.HandlerFunc
 }
@@ -36,4 +37,5 @@ func NewHandlers(services *service.Services, cfg *config.Config) *Handlers {
 
 func (h *Handlers) InitRoutes(e *echo.Group) {
 	h.Users.InitUsersRoutes(e)
+	h.Upload.InitUploaderRoutes(e)
 }

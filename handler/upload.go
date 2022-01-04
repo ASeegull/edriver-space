@@ -25,6 +25,14 @@ func NewUploadHandler(UploadService service.Uploader, cfg *config.Config) *Uploa
 	}
 }
 
+func (u *UploadHandler) InitUploaderRoutes(e *echo.Group) {
+	// Upload routes (secure access)
+	upload := e.Group("/upload")
+
+	upload.POST("/XML", u.UploadXMLFines()) // Upload XML fines data to the server
+	upload.POST("/Excel", u.UploadExcel())
+}
+
 // UploadXMLFines reads fines data from xml and writes them to the server
 func (u *UploadHandler) UploadXMLFines() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
