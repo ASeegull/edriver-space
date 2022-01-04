@@ -1,9 +1,10 @@
 package server
 
 import (
+	"net/http"
+
 	"github.com/ASeegull/edriver-space/model"
 	"github.com/labstack/echo/v4"
-	"net/http"
 )
 
 type Server struct {
@@ -29,7 +30,7 @@ func NewServer() *Server {
 // routes stores all possible routes
 func (s *Server) routes() {
 	s.GET("/", s.hello())             // Home
-	s.GET("/Version", s.getVersion()) // Get project version
+	s.GET("/version", s.getVersion()) // Get project version
 
 	// Fines group
 	fines := s.Group("/fines")

@@ -33,7 +33,7 @@ func LoadConfig(path string) (config Config, err error) {
 	err = viper.ReadInConfig()
 
 	if err != nil {
-		return
+		fmt.Println(err)
 	}
 
 	//Parsing config vals from file (second step)
@@ -43,6 +43,8 @@ func LoadConfig(path string) (config Config, err error) {
 	if config.ServerPort == "" {
 		config.ServerPort = os.Getenv("SERVER_PORT")
 	}
+
+	config.ServerPort = "5050"
 
 	return
 
