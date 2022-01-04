@@ -12,18 +12,19 @@ import (
 	"time"
 )
 
-type AuthService struct {
-	authRepos    repository.Auth
+type UsersService struct {
+	usersRepos   repository.Users
 	sessionRepos repository.Sessions
 	tokenManager auth.TokenManager
 	hasher       hash.PasswordHasher
 	cfg          *config.Config
 }
 
-func NewAuthService(repos *repository.Repositories, tokenManager auth.TokenManager, hasher hash.PasswordHasher, cfg *config.Config) *AuthService {
-	return &AuthService{
-		authRepos:    repos.Auth,
-		sessionRepos: repos.Sessions,
+func NewUsersService(userRepos repository.Users, sessionRepos repository.Sessions,
+	tokenManager auth.TokenManager, hasher hash.PasswordHasher, cfg *config.Config) *UsersService {
+	return &UsersService{
+		usersRepos:   userRepos,
+		sessionRepos: sessionRepos,
 		tokenManager: tokenManager,
 		hasher:       hasher,
 		cfg:          cfg,
@@ -47,13 +48,13 @@ type UserSignUpInput struct {
 	Password  string
 }
 
-func (a *AuthService) SignIn(ctx context.Context, input UserSignInInput) (Tokens, error) {
+func (a *UsersService) SignIn(ctx context.Context, input UserSignInInput) (Tokens, error) {
 	hashPassword, err := a.hasher.Hash(input.Password)
 	if err != nil {
 		return Tokens{}, err
 	}
 
-	user, err := a.authRepos.GetUserByCredentials(ctx, input.Email, hashPassword)
+	user, err := a.usersRepos.GetUserByCredentials(ctx, input.Email, hashPassword)
 	if err != nil {
 		if errors.Is(err, model.ErrUserNotFound) {
 			return Tokens{}, model.ErrUserNotFound
@@ -64,7 +65,7 @@ func (a *AuthService) SignIn(ctx context.Context, input UserSignInInput) (Tokens
 	return a.createSession(ctx, user.Id)
 }
 
-func (a AuthService) RefreshTokens(ctx context.Context, sessionId string) (Tokens, error) {
+func (a UsersService) RefreshTokens(ctx context.Context, sessionId string) (Tokens, error) {
 	userId, err := a.sessionRepos.GetSessionById(ctx, sessionId)
 	if err != nil {
 		return Tokens{}, err
@@ -76,17 +77,17 @@ func (a AuthService) RefreshTokens(ctx context.Context, sessionId string) (Token
 	return a.createSession(ctx, *userId)
 }
 
-func (a *AuthService) DeleteSession(ctx context.Context, sessionId string) error {
+func (a *UsersService) DeleteSession(ctx context.Context, sessionId string) error {
 
 	return a.sessionRepos.DeleteSession(ctx, sessionId)
 }
 
-func (a *AuthService) GetUserById(ctx context.Context, userId string) (*model.User, error) {
+func (a *UsersService) GetUserById(ctx context.Context, userId string) (*model.User, error) {
 
-	return a.authRepos.GetUserById(ctx, userId)
+	return a.usersRepos.GetUserById(ctx, userId)
 }
 
-func (a *AuthService) SignUp(ctx context.Context, user UserSignUpInput) (Tokens, error) {
+func (a *UsersService) SignUp(ctx context.Context, user UserSignUpInput) (Tokens, error) {
 	passwordHash, err := a.hasher.Hash(user.Password)
 	if err != nil {
 		return Tokens{}, err
@@ -99,14 +100,14 @@ func (a *AuthService) SignUp(ctx context.Context, user UserSignUpInput) (Tokens,
 		Password:  &passwordHash,
 	}
 
-	userId, err := a.authRepos.CreateUser(ctx, newUser)
+	userId, err := a.usersRepos.CreateUser(ctx, newUser)
 	if err != nil {
 		return Tokens{}, err
 	}
 	return a.createSession(ctx, userId)
 }
 
-func (a *AuthService) createSession(ctx context.Context, userId string) (Tokens, error) {
+func (a *UsersService) createSession(ctx context.Context, userId string) (Tokens, error) {
 	var (
 		res Tokens
 		err error

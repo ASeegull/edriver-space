@@ -7,27 +7,27 @@ import (
 	"github.com/lib/pq"
 )
 
-type AuthRepos struct {
+type UsersRepos struct {
 	db *sql.DB
 }
 
-func NewAuthRepos(db *sql.DB) *AuthRepos {
-	return &AuthRepos{
+func NewUsersRepos(db *sql.DB) *UsersRepos {
+	return &UsersRepos{
 		db: db,
 	}
 }
 
-func (a *AuthRepos) GetUserByCredentials(ctx context.Context, email, password string) (*model.User, error) {
+func (a *UsersRepos) GetUserByCredentials(ctx context.Context, email, password string) (*model.User, error) {
 
 	return a.getUser(ctx, "SELECT * FROM users WHERE email = $1 AND password = $2", email, password)
 }
 
-func (a *AuthRepos) GetUserById(ctx context.Context, userId string) (*model.User, error) {
+func (a *UsersRepos) GetUserById(ctx context.Context, userId string) (*model.User, error) {
 
 	return a.getUser(ctx, "SELECT * FROM users WHERE id = $1", userId)
 }
 
-func (a *AuthRepos) CreateUser(ctx context.Context, newUser model.User) (string, error) {
+func (a *UsersRepos) CreateUser(ctx context.Context, newUser model.User) (string, error) {
 	_, err := a.db.ExecContext(ctx, "INSERT INTO users(firstname, lastname, email, password) VALUES ($1, $2, $3, $4)",
 		newUser.Firstname, newUser.Lastname, newUser.Email, newUser.Password)
 	if err != nil {
@@ -49,7 +49,7 @@ func (a *AuthRepos) CreateUser(ctx context.Context, newUser model.User) (string,
 	return userId, nil
 }
 
-func (a *AuthRepos) getUser(ctx context.Context, query string, args ...interface{}) (*model.User, error) {
+func (a *UsersRepos) getUser(ctx context.Context, query string, args ...interface{}) (*model.User, error) {
 	user := &model.User{}
 
 	if err := a.db.QueryRowContext(ctx, query, args...).Scan(

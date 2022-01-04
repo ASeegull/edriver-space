@@ -10,7 +10,7 @@ import (
 	"github.com/ASeegull/edriver-space/repository"
 )
 
-type Auth interface {
+type Users interface {
 	SignUp(ctx context.Context, user UserSignUpInput) (Tokens, error)
 	SignIn(ctx context.Context, user UserSignInInput) (Tokens, error)
 	RefreshTokens(ctx context.Context, sessionId string) (Tokens, error)
@@ -24,13 +24,13 @@ type Uploader interface {
 }
 
 type Services struct {
-	Auth     Auth
+	Users    Users
 	Uploader Uploader
 }
 
 func NewServices(repos *repository.Repositories, tokenManager auth.TokenManager, hasher hash.PasswordHasher, cfg *config.Config) *Services {
 	return &Services{
-		Auth:     NewAuthService(repos, tokenManager, hasher, cfg),
+		Users:    NewUsersService(repos.Users, repos.Sessions, tokenManager, hasher, cfg),
 		Uploader: NewUploadService(repos, cfg),
 	}
 }

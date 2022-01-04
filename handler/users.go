@@ -9,16 +9,25 @@ import (
 	"net/http"
 )
 
-type AuthHandlers struct {
-	AuthService service.Auth
-	cfg         *config.Config
+type UsersHandlers struct {
+	usersService service.Users
+	cfg          *config.Config
 }
 
-func NewAuthHandlers(authService service.Auth, cfg *config.Config) *AuthHandlers {
-	return &AuthHandlers{
-		AuthService: authService,
-		cfg:         cfg,
+func NewUsersHandlers(usersService service.Users, cfg *config.Config) *UsersHandlers {
+	return &UsersHandlers{
+		usersService: usersService,
+		cfg:          cfg,
 	}
+}
+
+func (h *UsersHandlers) InitUsersRoutes(e *echo.Group) {
+	users := e.Group("/users")
+
+	users.POST("/sign-in", h.SignIn())
+	users.POST("/sign-out", h.SignOut())
+	users.POST("/sign-up", h.SignUp())
+	users.GET("/refresh-tokens", h.RefreshTokens())
 }
 
 type singInInput struct {
@@ -31,7 +40,7 @@ type tokenResponse struct {
 	RefreshToken string `json:"refreshToken"`
 }
 
-func (h *AuthHandlers) SignIn() echo.HandlerFunc {
+func (h *UsersHandlers) SignIn() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var input singInInput
 
@@ -39,7 +48,7 @@ func (h *AuthHandlers) SignIn() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, "invalid input body")
 		}
 
-		tokens, err := h.AuthService.SignIn(c.Request().Context(), service.UserSignInInput{
+		tokens, err := h.usersService.SignIn(c.Request().Context(), service.UserSignInInput{
 			Email:    input.Email,
 			Password: input.Password,
 		})
@@ -67,7 +76,7 @@ type signUpInput struct {
 	Password  string `json:"password"`
 }
 
-func (h *AuthHandlers) SignUp() echo.HandlerFunc {
+func (h *UsersHandlers) SignUp() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var input signUpInput
 
@@ -75,7 +84,7 @@ func (h *AuthHandlers) SignUp() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, "invalid input body")
 		}
 
-		tokens, err := h.AuthService.SignUp(c.Request().Context(), service.UserSignUpInput{
+		tokens, err := h.usersService.SignUp(c.Request().Context(), service.UserSignUpInput{
 			Firstname: input.Firstname,
 			Lastname:  input.Lastname,
 			Email:     input.Email,
@@ -98,7 +107,7 @@ func (h *AuthHandlers) SignUp() echo.HandlerFunc {
 	}
 }
 
-func (h *AuthHandlers) SignOut() echo.HandlerFunc {
+func (h *UsersHandlers) SignOut() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		cookie, err := c.Cookie(h.cfg.Cookie.Name)
 		if err != nil {
@@ -109,7 +118,7 @@ func (h *AuthHandlers) SignOut() echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, err.Error())
 		}
 
-		if err := h.AuthService.DeleteSession(c.Request().Context(), cookie.Value); err != nil {
+		if err := h.usersService.DeleteSession(c.Request().Context(), cookie.Value); err != nil {
 			return c.JSON(http.StatusInternalServerError, err.Error())
 		}
 
@@ -119,7 +128,7 @@ func (h *AuthHandlers) SignOut() echo.HandlerFunc {
 	}
 }
 
-func (h *AuthHandlers) RefreshTokens() echo.HandlerFunc {
+func (h *UsersHandlers) RefreshTokens() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		cookie, err := c.Cookie(h.cfg.Cookie.Name)
 		if err != nil {
@@ -130,7 +139,7 @@ func (h *AuthHandlers) RefreshTokens() echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, err.Error())
 		}
 
-		tokens, err := h.AuthService.RefreshTokens(c.Request().Context(), cookie.Value)
+		tokens, err := h.usersService.RefreshTokens(c.Request().Context(), cookie.Value)
 		if err != nil {
 			return c.JSON(http.StatusUnauthorized, err.Error())
 		}
@@ -144,7 +153,7 @@ func (h *AuthHandlers) RefreshTokens() echo.HandlerFunc {
 	}
 }
 
-func (h *AuthHandlers) createCookie(refreshToken string) *http.Cookie {
+func (h *UsersHandlers) createCookie(refreshToken string) *http.Cookie {
 	return &http.Cookie{
 		Name:     h.cfg.Cookie.Name,
 		Value:    refreshToken,
@@ -155,7 +164,7 @@ func (h *AuthHandlers) createCookie(refreshToken string) *http.Cookie {
 	}
 }
 
-func (h *AuthHandlers) deleteCookie() *http.Cookie {
+func (h *UsersHandlers) deleteCookie() *http.Cookie {
 	return &http.Cookie{
 		Name:     h.cfg.Cookie.Name,
 		Value:    "",

@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-type Auth interface {
+type Users interface {
 	GetUserByCredentials(ctx context.Context, email, password string) (*model.User, error)
 	GetUserById(ctx context.Context, userId string) (*model.User, error)
 	CreateUser(ctx context.Context, newUser model.User) (string, error)
@@ -28,14 +28,14 @@ type Uploader interface {
 }
 
 type Repositories struct {
-	Auth     Auth
+	Users    Users
 	Sessions Sessions
 	Uploader Uploader
 }
 
 func NewRepositories(postgres *sql.DB, redis *redis.Client) *Repositories {
 	return &Repositories{
-		Auth:     NewAuthRepos(postgres),
+		Users:    NewUsersRepos(postgres),
 		Sessions: NewSessionsRepos(redis),
 		Uploader: NewUploadRepos(postgres),
 	}

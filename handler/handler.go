@@ -6,8 +6,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// Auth provides authentication logic
-type Auth interface {
+type Users interface {
+	InitUsersRoutes(e *echo.Group)
 	SignIn() echo.HandlerFunc
 	SignUp() echo.HandlerFunc
 	SignOut() echo.HandlerFunc
@@ -22,14 +22,18 @@ type Uploader interface {
 
 // Handlers stores all handlers
 type Handlers struct {
-	Auth   Auth
+	Users  Users
 	Upload Uploader
 }
 
 // NewHandlers returns a pointer to new Handlers
 func NewHandlers(services *service.Services, cfg *config.Config) *Handlers {
 	return &Handlers{
-		Auth:   NewAuthHandlers(services.Auth, cfg),
+		Users:  NewUsersHandlers(services.Users, cfg),
 		Upload: NewUploadHandler(services.Uploader, cfg),
 	}
+}
+
+func (h *Handlers) InitRoutes(e *echo.Group) {
+	h.Users.InitUsersRoutes(e)
 }
