@@ -12,19 +12,19 @@ import (
 
 // UploadService stores upload logic
 type UploadService struct {
-	UploadRepos repository.Uploader
-	cfg         *config.Config
+	ParkingFinesRepos repository.ParkingFines
+	cfg               *config.Config
 }
 
 // NewUploadService returns a pointer to new UploadService
 func NewUploadService(repos *repository.Repositories, cfg *config.Config) *UploadService {
-	return &UploadService{UploadRepos: repos.Uploader, cfg: cfg}
+	return &UploadService{ParkingFinesRepos: repos.ParkingFines, cfg: cfg}
 }
 
 // XMLFinesService goes through all fines in data and passes each to the database query
 func (u *UploadService) XMLFinesService(ctx context.Context, data model.Data) error {
 	for _, fine := range data.ParkingFines {
-		err := u.UploadRepos.AddFine(ctx, fine) // Adding each fine to the database
+		err := u.ParkingFinesRepos.AddParkingFine(ctx, fine) // Adding each fine to the database
 		if err != nil {
 			return err
 		}
@@ -43,9 +43,9 @@ func (u *UploadService) ReadFinesExcel(ctx context.Context, r *bytes.Reader) err
 
 	// Indexes for getting data from rows
 	const (
-		IDCol = iota // 0
+		FineNumCol = iota // 0
 		IssueTimeCol
-		CarIDCol
+		CarVINCol
 		CostCol
 		URLCol
 	)
@@ -59,7 +59,7 @@ func (u *UploadService) ReadFinesExcel(ctx context.Context, r *bytes.Reader) err
 		// Go through all rows
 		for _, row := range rows {
 			// Skip the first row with designation info
-			if row[IDCol] == "ID" || row[IDCol] == "Id" || row[IDCol] == "id" || row[IDCol] == "iD" {
+			if row[FineNumCol] == "ID" || row[FineNumCol] == "Id" || row[FineNumCol] == "id" || row[FineNumCol] == "iD" {
 				continue
 			}
 			// Convert fine cost from string to int
@@ -68,10 +68,10 @@ func (u *UploadService) ReadFinesExcel(ctx context.Context, r *bytes.Reader) err
 				return err
 			}
 			// Create new parking fine
-			parkingFine := model.MakeParkingFine(row[IDCol], row[IssueTimeCol], row[CarIDCol], cost, row[URLCol])
+			parkingFine := model.MakeParkingFine(row[FineNumCol], row[IssueTimeCol], row[CarVINCol], cost, row[URLCol])
 
 			// Pass parking fine to the database query
-			err = u.UploadRepos.AddFine(ctx, parkingFine)
+			err = u.ParkingFinesRepos.AddParkingFine(ctx, parkingFine)
 			if err != nil {
 				return err
 			}
