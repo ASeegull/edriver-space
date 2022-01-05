@@ -6,31 +6,72 @@ import (
 	"github.com/ASeegull/edriver-space/model"
 )
 
-type UploadRepos struct {
+type ParkingFinesRepos struct {
 	*sql.DB
 }
 
-// NewUploadRepos returns pointer to new UploadRepos
-func NewUploadRepos(db *sql.DB) *UploadRepos {
-	return &UploadRepos{db}
+// NewParkingFinesRepos returns pointer to new UploadRepos
+func NewParkingFinesRepos(db *sql.DB) *ParkingFinesRepos {
+	return &ParkingFinesRepos{db}
 }
 
-func (u *UploadRepos) AddFine(ctx context.Context, fine model.ParkingFine) error {
-	//TODO Add fine to the database
-	panic("implement me")
+// AddParkingFine adds new parking fine to the database
+func (u *ParkingFinesRepos) AddParkingFine(ctx context.Context, fine model.ParkingFine) error {
+	_, err := u.DB.ExecContext(ctx, "INSERT INTO cars_parking_fines(fine_num, issue_time, car_VIN, cost, photo_url) VALUES ($1, $2, $3, $4, $5)",
+		fine.FineNum, fine.IssueTime, fine.CarVIN, fine.Cost, fine.PhotoURL)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (u *UploadRepos) GetFine(ctx context.Context, id string) (*model.ParkingFine, error) {
-	//TODO Get Parking fine from the database
-	panic("implement me")
+// GetParkingFine returns parking fine from the database by its id
+func (u *ParkingFinesRepos) GetParkingFine(ctx context.Context, id string) (*model.ParkingFine, error) {
+	parkingFine := model.ParkingFine{} // Store incoming data
+
+	err := u.DB.QueryRowContext(ctx, "SELECT * FROM cars_parking_fines WHERE id = $1", id).Scan(
+		&parkingFine.ID, &parkingFine.FineNum, &parkingFine.IssueTime, &parkingFine.CarVIN, &parkingFine.Cost, &parkingFine.PhotoURL)
+	if err != nil {
+		return nil, err
+	}
+	return &parkingFine, nil
 }
 
-func (u *UploadRepos) GetFines(ctx context.Context) ([]model.ParkingFine, error) {
-	//TODO Get all Parking fines from the database
-	panic("implement me")
+// GetParkingFines returns all existing parking fines from the database
+func (u *ParkingFinesRepos) GetParkingFines(ctx context.Context) ([]model.ParkingFine, error) {
+	parkingFines := make([]model.ParkingFine, 0) // Store all incoming data
+
+	rows, err := u.DB.QueryContext(ctx, "SELECT * FROM cars_parking_fines")
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		parkingFine := model.ParkingFine{} // Store data of each parking fine
+		err = rows.Scan(&parkingFine.ID, &parkingFine.FineNum, &parkingFine.IssueTime, &parkingFine.CarVIN, &parkingFine.Cost, &parkingFine.PhotoURL)
+		if err != nil {
+			return nil, err
+		}
+		// Add received parking fine to parking fine slice
+		parkingFines = append(parkingFines, parkingFine)
+	}
+
+	// Close rows and check errors
+	if err = rows.Close(); err != nil {
+		return nil, err
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return parkingFines, nil
 }
 
-func (u *UploadRepos) DeleteFine(ctx context.Context, id string) error {
-	//TODO delete parking fine from the database
-	panic("implement me")
+// DeleteParkingFine removes parking fine from the database by its id
+func (u *ParkingFinesRepos) DeleteParkingFine(ctx context.Context, id string) error {
+	_, err := u.DB.ExecContext(ctx, "DELETE FROM cars_parking_fines WHERE id = $1", id)
+	if err != nil {
+		return err
+	}
+	return nil
 }
