@@ -3,9 +3,6 @@ FROM golang:1.17-alpine as builder
 
 WORKDIR /src
 
-COPY go.mod .
-COPY go.sum .
-RUN go mod download
 COPY . .
 
 # build stage
@@ -17,11 +14,12 @@ FROM alpine:3.14
 LABEL GROUP Lv-644.Golang
 
 RUN apk add --update --no-cache ca-certificates
-WORKDIR /usr/lib/edriverspace
+WORKDIR /usr/lib/edriver-space
 COPY --from=builder /src/app /usr/lib/edriver-space/app
+COPY config/config-local.yml /usr/lib/edriver-space/config/config-local.yml
+
 RUN chmod +x /usr/lib/edriver-space/app
 
 ENTRYPOINT [ "/usr/lib/edriver-space/app" ]
 
-USER app
 EXPOSE 5050
