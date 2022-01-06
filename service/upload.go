@@ -8,6 +8,7 @@ import (
 	"github.com/ASeegull/edriver-space/repository"
 	"github.com/xuri/excelize/v2"
 	"strconv"
+	"strings"
 )
 
 // UploadService stores upload logic
@@ -59,7 +60,7 @@ func (u *UploadService) ReadFinesExcel(ctx context.Context, r *bytes.Reader) err
 		// Go through all rows
 		for _, row := range rows {
 			// Skip the first row with designation info
-			if row[FineNumCol] == "ID" || row[FineNumCol] == "Id" || row[FineNumCol] == "id" || row[FineNumCol] == "iD" {
+			if strings.ToLower(row[FineNumCol]) == "id" {
 				continue
 			}
 			// Convert fine cost from string to int
