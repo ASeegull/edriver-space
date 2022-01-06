@@ -22,7 +22,7 @@ start:
 	docker-compose up -d --build
 
 stop:
-	docker compose stop
+	docker-compose stop
 
 restart:
 	make stop
