@@ -2,16 +2,18 @@ package handler
 
 import (
 	"github.com/ASeegull/edriver-space/config"
+	"github.com/ASeegull/edriver-space/middleware"
 	"github.com/ASeegull/edriver-space/service"
 	"github.com/labstack/echo/v4"
 )
 
 type Users interface {
-	InitUsersRoutes(e *echo.Group)
+	InitUsersRoutes(e *echo.Group, mw middleware.Middleware)
 	SignIn() echo.HandlerFunc
 	SignUp() echo.HandlerFunc
 	SignOut() echo.HandlerFunc
 	RefreshTokens() echo.HandlerFunc
+	AddDriverLicence() echo.HandlerFunc
 }
 
 // Uploader provides methods to upload fines on the server
@@ -35,7 +37,7 @@ func NewHandlers(services *service.Services, cfg *config.Config) *Handlers {
 	}
 }
 
-func (h *Handlers) InitRoutes(e *echo.Group) {
-	h.Users.InitUsersRoutes(e)
+func (h *Handlers) InitRoutes(e *echo.Group, mw middleware.Middleware) {
+	h.Users.InitUsersRoutes(e, mw)
 	h.Upload.InitUploaderRoutes(e)
 }
