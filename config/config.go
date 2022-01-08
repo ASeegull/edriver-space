@@ -1,81 +1,77 @@
 package config
 
 import (
-	"errors"
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
+	"github.com/kelseyhightower/envconfig"
 )
 
 type Config struct {
-	Server    ServerConfig
-	Postgres  PostgresConfig
-	Redis     RedisConfig
-	Cookie    Cookie
-	TokensTTL TokensTTL
+	Server   ServerConfig
+	Postgres PostgresConfig
+	Redis    RedisConfig
+	Cookie   CookieConfig
+	Token    TokenConfig
 }
 
 type ServerConfig struct {
-	Port string
+	Port         string `envconfig:"port"`
+	DBDriver     string `envconfig:"db_driver"`
+	JWTSecretKey string `envconfig:"jwt_secret_key"`
+	HashSalt     string `envconfig:"hash_salt"`
 }
 
 type PostgresConfig struct {
-	PostgresqlHost     string
-	PostgresqlUser     string
-	PostgresqlPassword string
-	PostgresqlDbname   string
-	PostgresqlSSLMode  string
-	PostgresqlDriver   string
+	Host     string `envconfig:"host"`
+	User     string `envconfig:"user"`
+	Password string `envconfig:"password"`
+	DB       string `envconfig:"db"`
+	SSLMode  string `envconfig:"sslmode"`
+	Driver   string `envconfig:"driver"`
 }
 
 type RedisConfig struct {
-	RedisHost string
-	Password  string
-	DB        int
+	Host     string `envconfig:"host"`
+	Password string `envconfig:"password"`
+	DB       int    `envconfig:"db"`
 }
 
-type Cookie struct {
-	Name     string
-	MaxAge   int
-	Path     string
-	Secure   bool
-	HTTPOnly bool
+type CookieConfig struct {
+	Name     string `envconfig:"name"`
+	MaxAge   int    `envconfig:"max_age"`
+	Path     string `envconfig:"path"`
+	Secure   bool   `envconfig:"secure"`
+	HTTPOnly bool   `envconfig:"http_only"`
 }
 
-type TokensTTL struct {
-	Access  int
-	Refresh int
+type TokenConfig struct {
+	AccessTTL  int `envconfig:"access_ttl"`
+	RefreshTTL int `envconfig:"refresh_ttl"`
 }
 
-//LoadConfig - Load config file from given path
-func LoadConfig(filename string) (*viper.Viper, error) {
-	v := viper.New()
+const (
+	appGroup      = "server"
+	cookieGroup   = "cookie"
+	postgresGroup = "postgres"
+	redisGroup    = "redis"
+	tokenGroup    = "token"
+)
 
-	v.SetConfigName(filename)
-	v.AddConfigPath(".")
-	v.AutomaticEnv()
-	if err := v.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			return nil, errors.New("config file not found")
-		}
+func CreateConfig() (*Config, error) {
+	config := new(Config)
+
+	if err := envconfig.Process(appGroup, &config.Server); err != nil {
 		return nil, err
 	}
-
-	return v, nil
-}
-
-//ParseConfig - Parse config file
-func ParseConfig(v *viper.Viper) (*Config, error) {
-	var c Config
-
-	err := v.Unmarshal(&c)
-	if err != nil {
-		log.Printf("unable to decode into struct, %v", err)
+	if err := envconfig.Process(cookieGroup, &config.Cookie); err != nil {
 		return nil, err
 	}
-
-	// get from env
-	c.Redis.RedisHost = v.Get("REDIS_HOST").(string)
-	c.Postgres.PostgresqlHost = v.Get("POSTGRES_HOST").(string)
-
-	return &c, nil
+	if err := envconfig.Process(postgresGroup, &config.Postgres); err != nil {
+		return nil, err
+	}
+	if err := envconfig.Process(redisGroup, &config.Redis); err != nil {
+		return nil, err
+	}
+	if err := envconfig.Process(tokenGroup, &config.Token); err != nil {
+		return nil, err
+	}
+	return config, nil
 }
