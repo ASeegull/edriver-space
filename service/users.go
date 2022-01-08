@@ -116,7 +116,7 @@ func (s *UsersService) createSession(ctx context.Context, userId string) (Tokens
 	g := new(errgroup.Group)
 
 	g.Go(func() error {
-		accessTokenTTL := time.Duration(s.cfg.TokensTTL.Access) * time.Minute
+		accessTokenTTL := time.Duration(s.cfg.Token.AccessTTL) * time.Minute
 
 		res.AccessToken, err = s.tokenManager.NewJWT(userId, "user", accessTokenTTL)
 
@@ -133,7 +133,7 @@ func (s *UsersService) createSession(ctx context.Context, userId string) (Tokens
 		return Tokens{}, err
 	}
 
-	refreshTokenTTL := time.Duration(s.cfg.TokensTTL.Refresh) * time.Minute
+	refreshTokenTTL := time.Duration(s.cfg.Token.RefreshTTL) * time.Minute
 
 	err = s.sessionRepos.SetSession(ctx, res.RefreshToken, userId, refreshTokenTTL)
 

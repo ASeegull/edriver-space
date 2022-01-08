@@ -1,25 +1,22 @@
 package main
 
 import (
+	"fmt"
 	"github.com/ASeegull/edriver-space/config"
 	"github.com/ASeegull/edriver-space/logger"
 	_ "github.com/ASeegull/edriver-space/migrations"
 	"github.com/ASeegull/edriver-space/server"
 	"github.com/ASeegull/edriver-space/storage"
 	"github.com/pressly/goose/v3"
-	"os"
 )
 
 func main() {
-	cfgViper, err := config.LoadConfig(os.Getenv("CONFIG_PATH"))
+	cfg, err := config.CreateConfig()
 	if err != nil {
 		logger.LogFatal(err)
 	}
 
-	cfg, err := config.ParseConfig(cfgViper)
-	if err != nil {
-		logger.LogFatal(err)
-	}
+	fmt.Println(cfg)
 
 	postgres, err := storage.NewPostgresDB(cfg)
 	if err != nil {

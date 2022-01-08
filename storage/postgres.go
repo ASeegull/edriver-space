@@ -13,14 +13,14 @@ import (
 
 func NewPostgresDB(cfg *config.Config) (*sql.DB, error) {
 	dsn := fmt.Sprintf("%s://%s:%s@%s/%s?sslmode=%s",
-		cfg.Postgres.PostgresqlDriver,
-		cfg.Postgres.PostgresqlUser,
-		cfg.Postgres.PostgresqlPassword,
-		cfg.Postgres.PostgresqlHost,
-		cfg.Postgres.PostgresqlDbname,
-		cfg.Postgres.PostgresqlSSLMode)
+		cfg.Server.DBDriver,
+		cfg.Postgres.User,
+		cfg.Postgres.Password,
+		cfg.Postgres.Host,
+		cfg.Postgres.DB,
+		cfg.Postgres.SSLMode)
 
-	db, err := goose.OpenDBWithDriver(cfg.Postgres.PostgresqlDriver, dsn)
+	db, err := goose.OpenDBWithDriver(cfg.Server.DBDriver, dsn)
 	if err != nil {
 		return nil, err
 	}
