@@ -1,70 +1,77 @@
 package config
 
 import (
-	"fmt"
-	"os"
-
-	"github.com/spf13/viper"
+	"github.com/kelseyhightower/envconfig"
 )
 
-//Config struct stores all configuration values for project using Viper
 type Config struct {
-	DBDriver      string `mapstructure:"DB_DRIVER"`
-	DBSource      string `mapstructure:"DB_SOURCE"`
-	ServerAddress string `mapstructure:"SERVER_ADDRESS"`
-	ServerPort    string `mapstructure:"SERVER_PORT"`
+	Server   ServerConfig
+	Postgres PostgresConfig
+	Redis    RedisConfig
+	Cookie   CookieConfig
+	Token    TokenConfig
 }
 
-//LoadConfig reads configuration from .env  file
-func LoadConfig(path string) (config Config, err error) {
-
-	//Setting default path for config file
-	if path == "" {
-		path = "./config"
-	}
-
-	//Declareting path and type for config file
-	viper.AddConfigPath(path)
-	viper.SetConfigType("env")
-
-	viper.AutomaticEnv()
-
-	//Parsing config vals from file (first step)
-	err = viper.ReadInConfig()
-
-	if err != nil {
-		return
-	}
-
-	//Parsing config vals from file (second step)
-	err = viper.Unmarshal(&config)
-
-	//If it is nescessary to hardcore port - just add value for SERVER_PORT in .env file
-	if config.ServerPort == "" {
-		config.ServerPort = os.Getenv("SERVER_PORT")
-	}
-
-	return
-
+type ServerConfig struct {
+	Port         string `envconfig:"port"`
+	DBDriver     string `envconfig:"db_driver"`
+	JWTSecretKey string `envconfig:"jwt_secret_key"`
+	HashSalt     string `envconfig:"hash_salt"`
 }
 
-// GetConfigString returns specific value from config file
-func GetConfigString(ValName string) (val string, err error) {
+type PostgresConfig struct {
+	Host     string `envconfig:"host"`
+	User     string `envconfig:"user"`
+	Password string `envconfig:"password"`
+	DB       string `envconfig:"db"`
+	SSLMode  string `envconfig:"sslmode"`
+	Driver   string `envconfig:"driver"`
+}
 
-	//Loading config
-	config, _ := LoadConfig("./config")
+type RedisConfig struct {
+	Host     string `envconfig:"host"`
+	Password string `envconfig:"password"`
+	DB       int    `envconfig:"db"`
+}
 
-	switch ValName {
-	case "DBDriver":
-		val = config.DBDriver
-	case "DBSource":
-		val = config.DBSource
-	case "ServerAddress":
-		val = config.ServerAddress
-	default:
-		err = fmt.Errorf("Cannot find value " + ValName)
+type CookieConfig struct {
+	Name     string `envconfig:"name"`
+	MaxAge   int    `envconfig:"max_age"`
+	Path     string `envconfig:"path"`
+	Secure   bool   `envconfig:"secure"`
+	HTTPOnly bool   `envconfig:"http_only"`
+}
+
+type TokenConfig struct {
+	AccessTTL  int `envconfig:"access_ttl"`
+	RefreshTTL int `envconfig:"refresh_ttl"`
+}
+
+const (
+	appGroup      = "server"
+	cookieGroup   = "cookie"
+	postgresGroup = "postgres"
+	redisGroup    = "redis"
+	tokenGroup    = "token"
+)
+
+func CreateConfig() (*Config, error) {
+	config := new(Config)
+
+	if err := envconfig.Process(appGroup, &config.Server); err != nil {
+		return nil, err
 	}
-
-	return
-
+	if err := envconfig.Process(cookieGroup, &config.Cookie); err != nil {
+		return nil, err
+	}
+	if err := envconfig.Process(postgresGroup, &config.Postgres); err != nil {
+		return nil, err
+	}
+	if err := envconfig.Process(redisGroup, &config.Redis); err != nil {
+		return nil, err
+	}
+	if err := envconfig.Process(tokenGroup, &config.Token); err != nil {
+		return nil, err
+	}
+	return config, nil
 }
