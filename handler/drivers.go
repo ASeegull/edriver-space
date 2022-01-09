@@ -21,6 +21,15 @@ func NewDriverHandlers(driverService service.Drivers, cfg *config.Config) *Drive
 	}
 }
 
+func (driversHandler *DriversHandlers) InitCarsRoutes(e *echo.Group) {
+	driversRouters := e.Group("/drivers")
+
+	driversRouters.POST("/", driversHandler.CreateDriver())
+	driversRouters.GET("/:id", driversHandler.GetDriver())
+	driversRouters.GET("/", driversHandler.GetDrivers())
+	driversRouters.DELETE("/:id", driversHandler.DeleteDriver())
+}
+
 func (driversHandler *DriversHandlers) CreateDriver() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var driver model.Driver

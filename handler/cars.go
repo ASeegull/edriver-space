@@ -21,6 +21,15 @@ func NewCarsHandlers(carService service.Cars, cfg *config.Config) *CarsHandlers 
 	}
 }
 
+func (carsHandler *CarsHandlers) InitCarsRoutes(e *echo.Group) {
+	carsRouters := e.Group("/cars")
+
+	carsRouters.POST("/", carsHandler.CreateCar())
+	carsRouters.GET("/:id", carsHandler.GetCar())
+	carsRouters.GET("/", carsHandler.GetCars())
+	carsRouters.DELETE("/:id", carsHandler.DeleteCar())
+}
+
 func (carsHandler *CarsHandlers) CreateCar() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var car model.Car

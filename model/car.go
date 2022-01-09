@@ -9,7 +9,7 @@ type Car struct {
 
 	VehicleCategory       string `json:"vehicle_category"`
 	Make                  string `json:"make"`
-	Type                  string `json:"type`
+	Type                  string `json:"type"`
 	CommercialDescription string `json:"commercial_description"`
 
 	MaxMass     int    `json:"maximum_mass"`
