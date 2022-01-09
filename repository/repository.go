@@ -45,26 +45,20 @@ type Drivers interface {
 }
 
 type Repositories struct {
-	Users    Users
-	Sessions Sessions
-	Uploader Uploader
-	Cars     Cars
-	Drivers  Drivers
 	Users        Users
 	Sessions     Sessions
+	Cars         Cars
+	Drivers      Drivers
 	ParkingFines ParkingFines
 }
 
 func NewRepositories(postgres *sql.DB, redis *redis.Client) *Repositories {
 	return &Repositories{
 
-		Users:    NewUsersRepos(postgres),
-		Sessions: NewSessionsRepos(redis),
-		Uploader: NewUploadRepos(postgres),
 		Users:        NewUsersRepos(postgres),
 		Sessions:     NewSessionsRepos(redis),
-		ParkingFines: NewParkingFinesRepos(postgres),2
-    Cars:     NewCarsRepos(postgres),
-		Drivers:  NewDriversRepos(postgres),
+		ParkingFines: NewParkingFinesRepos(postgres),
+		Cars:         NewCarsRepos(postgres),
+		Drivers:      NewDriversRepos(postgres),
 	}
 }
