@@ -12,6 +12,8 @@ type Users interface {
 	GetUserByCredentials(ctx context.Context, email, password string) (*model.User, error)
 	GetUserById(ctx context.Context, userId string) (*model.User, error)
 	CreateUser(ctx context.Context, newUser model.User) (string, error)
+	GetDriverLicence(ctx context.Context, individualTaxNumber string) (string, error)
+	UpdateUserDriverLicence(ctx context.Context, userId, licenceNumber string) error
 }
 
 type Sessions interface {

@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"github.com/ASeegull/edriver-space/config"
+	"github.com/ASeegull/edriver-space/middleware"
 	"github.com/ASeegull/edriver-space/model"
 	"github.com/ASeegull/edriver-space/service"
 	"github.com/labstack/echo/v4"
@@ -21,13 +22,17 @@ func NewUsersHandlers(usersService service.Users, cfg *config.Config) *UsersHand
 	}
 }
 
-func (h *UsersHandlers) InitUsersRoutes(e *echo.Group) {
+func (h *UsersHandlers) InitUsersRoutes(e *echo.Group, mw middleware.Middleware) {
 	users := e.Group("/users")
 
 	users.POST("/sign-in", h.SignIn())
 	users.POST("/sign-out", h.SignOut())
 	users.POST("/sign-up", h.SignUp())
 	users.GET("/refresh-tokens", h.RefreshTokens())
+
+	authenticated := users.Group("/", mw.UserIdentity())
+
+	authenticated.POST("add-driver-licence", h.AddDriverLicence())
 }
 
 type singInInput struct {
@@ -150,6 +155,34 @@ func (h *UsersHandlers) RefreshTokens() echo.HandlerFunc {
 			AccessToken:  tokens.AccessToken,
 			RefreshToken: tokens.RefreshToken,
 		})
+	}
+}
+
+type addDriverLicenceInput struct {
+	IndividualTaxNumber string `json:"individual_tax_number"`
+}
+
+func (h UsersHandlers) AddDriverLicence() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var input addDriverLicenceInput
+		if err := c.Bind(&input); err != nil {
+			return c.JSON(http.StatusBadRequest, err.Error())
+		}
+
+		userId, ok := c.Get("userId").(string)
+		if !ok {
+			return c.JSON(http.StatusUnauthorized, "user id is not present in context")
+		}
+
+		if err := h.usersService.AddDriverLicence(c.Request().Context(), service.AddDriverLicenceInput{
+			IndividualTaxNumber: input.IndividualTaxNumber,
+		}, userId); err != nil {
+			if errors.Is(err, model.ErrDriverLicenceNotFound) {
+				return c.JSON(http.StatusBadRequest, err.Error())
+			}
+			return c.JSON(http.StatusInternalServerError, err.Error())
+		}
+		return c.JSON(http.StatusOK, "successfully added")
 	}
 }
 
