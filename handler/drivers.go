@@ -21,7 +21,7 @@ func NewDriverHandlers(driverService service.Drivers, cfg *config.Config) *Drive
 	}
 }
 
-func (driversHandler *DriversHandlers) InitCarsRoutes(e *echo.Group) {
+func (driversHandler *DriversHandlers) InitDriversRoutes(e *echo.Group) {
 	driversRouters := e.Group("/drivers")
 
 	driversRouters.POST("/", driversHandler.CreateDriver())
