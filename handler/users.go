@@ -2,11 +2,12 @@ package handler
 
 import (
 	"errors"
+	"net/http"
+
 	"github.com/ASeegull/edriver-space/config"
 	"github.com/ASeegull/edriver-space/model"
 	"github.com/ASeegull/edriver-space/service"
 	"github.com/labstack/echo/v4"
-	"net/http"
 )
 
 type UsersHandlers struct {
@@ -28,6 +29,7 @@ func (h *UsersHandlers) InitUsersRoutes(e *echo.Group) {
 	users.POST("/sign-out", h.SignOut())
 	users.POST("/sign-up", h.SignUp())
 	users.GET("/refresh-tokens", h.RefreshTokens())
+
 }
 
 type singInInput struct {
