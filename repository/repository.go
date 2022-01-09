@@ -13,6 +13,8 @@ type Users interface {
 	GetUserByCredentials(ctx context.Context, email, password string) (*model.User, error)
 	GetUserById(ctx context.Context, userId string) (*model.User, error)
 	CreateUser(ctx context.Context, newUser model.User) (string, error)
+	GetDriverLicence(ctx context.Context, individualTaxNumber string) (string, error)
+	UpdateUserDriverLicence(ctx context.Context, userId, licenceNumber string) error
 }
 
 type Sessions interface {
@@ -21,11 +23,11 @@ type Sessions interface {
 	DeleteSession(ctx context.Context, sessionId string) error
 }
 
-type Uploader interface {
-	GetFine(ctx context.Context, id string) (*model.ParkingFine, error)
-	GetFines(ctx context.Context) ([]model.ParkingFine, error)
-	AddFine(ctx context.Context, fine model.ParkingFine) error
-	DeleteFine(ctx context.Context, id string) error
+type ParkingFines interface {
+	GetParkingFine(ctx context.Context, id string) (*model.ParkingFine, error)
+	GetParkingFines(ctx context.Context) ([]model.ParkingFine, error)
+	AddParkingFine(ctx context.Context, fine model.ParkingFine) error
+	DeleteParkingFine(ctx context.Context, id string) error
 }
 
 type Cars interface {
@@ -48,14 +50,21 @@ type Repositories struct {
 	Uploader Uploader
 	Cars     Cars
 	Drivers  Drivers
+	Users        Users
+	Sessions     Sessions
+	ParkingFines ParkingFines
 }
 
 func NewRepositories(postgres *sql.DB, redis *redis.Client) *Repositories {
 	return &Repositories{
+
 		Users:    NewUsersRepos(postgres),
 		Sessions: NewSessionsRepos(redis),
 		Uploader: NewUploadRepos(postgres),
-		Cars:     NewCarsRepos(postgres),
+		Users:        NewUsersRepos(postgres),
+		Sessions:     NewSessionsRepos(redis),
+		ParkingFines: NewParkingFinesRepos(postgres),2
+    Cars:     NewCarsRepos(postgres),
 		Drivers:  NewDriversRepos(postgres),
 	}
 }

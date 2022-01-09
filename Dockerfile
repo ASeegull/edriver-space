@@ -16,7 +16,6 @@ LABEL GROUP Lv-644.Golang
 RUN apk add --update --no-cache ca-certificates
 WORKDIR /usr/lib/edriver-space
 COPY --from=builder /src/app /usr/lib/edriver-space/app
-COPY config/config-local.yml /usr/lib/edriver-space/config/config-local.yml
 
 RUN chmod +x /usr/lib/edriver-space/app
 

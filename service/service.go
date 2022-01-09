@@ -17,6 +17,7 @@ type Users interface {
 	RefreshTokens(ctx context.Context, sessionId string) (Tokens, error)
 	GetUserById(ctx context.Context, userId string) (*model.User, error)
 	DeleteSession(ctx context.Context, sessionId string) error
+	AddDriverLicence(ctx context.Context, input AddDriverLicenceInput, userId string) error
 }
 
 type Uploader interface {
