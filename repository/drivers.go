@@ -18,7 +18,7 @@ func NewDriversRepos(db *sql.DB) *DriversRepos {
 	}
 }
 
-func (d *DriversRepos) AddDriver(ctx context.Context, driver model.Driver) error {
+func (d *DriversRepos) CreateDriver(ctx context.Context, driver *model.Driver) (*model.Driver, error) {
 	query := `INSERT INTO drivers(
 		id,
 		license_number,
@@ -49,15 +49,15 @@ func (d *DriversRepos) AddDriver(ctx context.Context, driver model.Driver) error
 		driver.Restrictions,
 	)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return driver, nil
 
 }
 
 func (d *DriversRepos) GetDriver(ctx context.Context, id string) (*model.Driver, error) {
 	// Define driver variable.
-	driver := model.Driver{}
+	driver := &model.Driver{}
 
 	// Send query to database.
 	query := `SELECT * FROM drivers WHERE id = $1`
@@ -79,10 +79,10 @@ func (d *DriversRepos) GetDriver(ctx context.Context, id string) (*model.Driver,
 		// Return empty object and error.
 		return nil, err
 	}
-	return &model.Driver{}, nil
+	return driver, nil
 }
 
-func (d DriversRepos) GetDrivers(ctx context.Context) ([]model.Driver, error) {
+func (d DriversRepos) GetDrivers(ctx context.Context) (*[]model.Driver, error) {
 	drivers := make([]model.Driver, 0) // Store all incoming data
 
 	query := `SELECT * FROM drivers`
@@ -118,7 +118,7 @@ func (d DriversRepos) GetDrivers(ctx context.Context) ([]model.Driver, error) {
 		return nil, err
 	}
 
-	return drivers, nil
+	return &drivers, nil
 }
 
 func (d DriversRepos) DeleteDriver(ctx context.Context, id string) error {

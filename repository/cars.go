@@ -18,13 +18,13 @@ func NewCarsRepos(db *sql.DB) *CarsRepos {
 	}
 }
 
-func (c *CarsRepos) AddCar(ctx context.Context, car model.Car) error {
+func (c *CarsRepos) CreateCar(ctx context.Context, car *model.Car) (*model.Car, error) {
 	query := `INSERT INTO cars(
 		name, 
 		VIN_code, 
 		registration_number, 
 		vehicle_category, 
-		make, 
+		make,
 		type, 
 		commercial_description,
 		maximum_mass, 
@@ -39,7 +39,7 @@ func (c *CarsRepos) AddCar(ctx context.Context, car model.Car) error {
 		address, 
 		ownership) 
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 
-			$12, $13, $14, $15, $16, $17, $18, $19)`
+			$12, $13, $14, $15, $16, $17, $18)`
 	_, err := c.db.ExecContext(ctx, query,
 		car.ID,
 		car.Name,
@@ -61,9 +61,9 @@ func (c *CarsRepos) AddCar(ctx context.Context, car model.Car) error {
 		car.Address,
 		car.Ownership)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return car, nil
 
 }
 
@@ -101,7 +101,7 @@ func (c *CarsRepos) GetCar(ctx context.Context, id string) (*model.Car, error) {
 	return &model.Car{}, nil
 }
 
-func (c CarsRepos) GetCars(ctx context.Context) ([]model.Car, error) {
+func (c CarsRepos) GetCars(ctx context.Context) (*[]model.Car, error) {
 	cars := make([]model.Car, 0) // Store all incoming data
 
 	query := `SELECT * FROM cars`
@@ -144,7 +144,7 @@ func (c CarsRepos) GetCars(ctx context.Context) ([]model.Car, error) {
 		return nil, err
 	}
 
-	return cars, nil
+	return &cars, nil
 }
 
 func (c CarsRepos) DeleteCar(ctx context.Context, id string) error {

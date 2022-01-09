@@ -30,15 +30,15 @@ type Uploader interface {
 
 type Cars interface {
 	GetCar(ctx context.Context, id string) (*model.Car, error)
-	GetCars(ctx context.Context) ([]model.Car, error)
-	AddCar(ctx context.Context, car model.Car) error
+	GetCars(ctx context.Context) (*[]model.Car, error)
+	CreateCar(ctx context.Context, car *model.Car) (*model.Car, error)
 	DeleteCar(ctx context.Context, id string) error
 }
 
 type Drivers interface {
 	GetDriver(ctx context.Context, id string) (*model.Driver, error)
-	GetDrivers(ctx context.Context) ([]model.Driver, error)
-	AddDriver(ctx context.Context, car model.Driver) error
+	GetDrivers(ctx context.Context) (*[]model.Driver, error)
+	CreateDriver(ctx context.Context, driver *model.Driver) (*model.Driver, error)
 	DeleteDriver(ctx context.Context, id string) error
 }
 
