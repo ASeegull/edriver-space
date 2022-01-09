@@ -2,14 +2,14 @@ package model
 
 // Car fields may be not final
 type Car struct {
-	ID              int    `json:"id"`
+	ID              string `json:"id"`
 	Name            string `json:"name"`
 	VIN             string `json:"VIN_code"`
 	RegistrationNum string `json:"registration_number"`
 
 	VehicleCategory       string `json:"vehicle_category"`
 	Make                  string `json:"make"`
-	Type                  string `json:"type"`
+	Type                  string `json:"type`
 	CommercialDescription string `json:"commercial_description"`
 
 	MaxMass     int    `json:"maximum_mass"`
