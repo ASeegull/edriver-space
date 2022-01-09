@@ -182,7 +182,7 @@ func (h UsersHandlers) AddDriverLicence() echo.HandlerFunc {
 			}
 			return c.JSON(http.StatusInternalServerError, err.Error())
 		}
-		return c.JSON(http.StatusOK, c.Get("userId"))
+		return c.JSON(http.StatusOK, "successfully added")
 	}
 }
 
