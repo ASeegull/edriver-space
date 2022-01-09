@@ -2,7 +2,7 @@ package model
 
 // Driver fields may be not final
 type Driver struct {
-	ID                  int    `json:"id"`
+	ID                  string `json:"id"`
 	LicenseNumber       string `json:"license_number"`
 	DateOfIssue         string `json:"date_of_issue"`
 	ExpireDate          string `json:"expire_date"`

@@ -3,9 +3,10 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"time"
+
 	"github.com/ASeegull/edriver-space/model"
 	"github.com/go-redis/redis/v8"
-	"time"
 )
 
 type Users interface {
@@ -29,7 +30,26 @@ type ParkingFines interface {
 	DeleteParkingFine(ctx context.Context, id string) error
 }
 
+type Cars interface {
+	GetCar(ctx context.Context, id string) (*model.Car, error)
+	GetCars(ctx context.Context) (*[]model.Car, error)
+	CreateCar(ctx context.Context, car *model.Car) (*model.Car, error)
+	DeleteCar(ctx context.Context, id string) error
+}
+
+type Drivers interface {
+	GetDriver(ctx context.Context, id string) (*model.Driver, error)
+	GetDrivers(ctx context.Context) (*[]model.Driver, error)
+	CreateDriver(ctx context.Context, driver *model.Driver) (*model.Driver, error)
+	DeleteDriver(ctx context.Context, id string) error
+}
+
 type Repositories struct {
+	Users    Users
+	Sessions Sessions
+	Uploader Uploader
+	Cars     Cars
+	Drivers  Drivers
 	Users        Users
 	Sessions     Sessions
 	ParkingFines ParkingFines
@@ -37,8 +57,14 @@ type Repositories struct {
 
 func NewRepositories(postgres *sql.DB, redis *redis.Client) *Repositories {
 	return &Repositories{
+
+		Users:    NewUsersRepos(postgres),
+		Sessions: NewSessionsRepos(redis),
+		Uploader: NewUploadRepos(postgres),
 		Users:        NewUsersRepos(postgres),
 		Sessions:     NewSessionsRepos(redis),
-		ParkingFines: NewParkingFinesRepos(postgres),
+		ParkingFines: NewParkingFinesRepos(postgres),2
+    Cars:     NewCarsRepos(postgres),
+		Drivers:  NewDriversRepos(postgres),
 	}
 }
