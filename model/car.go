@@ -3,6 +3,7 @@ package model
 // Car fields may be not final
 type Car struct {
 	ID              int    `json:"id"`
+	Name            string `json:"name"`
 	VIN             string `json:"VIN_code"`
 	RegistrationNum string `json:"registration_number"`
 
