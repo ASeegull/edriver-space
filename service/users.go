@@ -150,8 +150,5 @@ func (s *UsersService) AddDriverLicence(ctx context.Context, input AddDriverLice
 		return err
 	}
 
-	if err := s.usersRepos.UpdateUserDriverLicence(ctx, userId, licenceNumber); err != nil {
-		return err
-	}
-	return nil
+	return s.usersRepos.UpdateUserDriverLicence(ctx, userId, licenceNumber)
 }
