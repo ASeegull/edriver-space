@@ -37,8 +37,8 @@ func (h *UsersHandlers) InitUsersRoutes(e *echo.Group, mw middleware.Middleware)
 }
 
 type singInInput struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Email    string `json:"email" validate:"required"`
+	Password string `json:"password" validate:"required"`
 }
 
 type tokenResponse struct {
@@ -51,6 +51,10 @@ func (h *UsersHandlers) SignIn() echo.HandlerFunc {
 		var input singInInput
 
 		if err := c.Bind(&input); err != nil {
+			return c.JSON(http.StatusBadRequest, "input body has not json format")
+		}
+
+		if err := c.Validate(input); err != nil {
 			return c.JSON(http.StatusBadRequest, "invalid input body")
 		}
 
@@ -76,10 +80,10 @@ func (h *UsersHandlers) SignIn() echo.HandlerFunc {
 }
 
 type signUpInput struct {
-	Firstname string `json:"firstname"`
-	Lastname  string `json:"lastname"`
-	Email     string `json:"email"`
-	Password  string `json:"password"`
+	Firstname string `json:"firstname" validate:"required,max=64"`
+	Lastname  string `json:"lastname" validate:"required,max=64"`
+	Email     string `json:"email" validate:"required"`
+	Password  string `json:"password" validate:"required,min=8,max=32"`
 }
 
 func (h *UsersHandlers) SignUp() echo.HandlerFunc {
@@ -87,6 +91,10 @@ func (h *UsersHandlers) SignUp() echo.HandlerFunc {
 		var input signUpInput
 
 		if err := c.Bind(&input); err != nil {
+			return c.JSON(http.StatusBadRequest, "input body has not json format")
+		}
+
+		if err := c.Validate(input); err != nil {
 			return c.JSON(http.StatusBadRequest, "invalid input body")
 		}
 
@@ -160,14 +168,19 @@ func (h *UsersHandlers) RefreshTokens() echo.HandlerFunc {
 }
 
 type addDriverLicenceInput struct {
-	IndividualTaxNumber string `json:"individual_tax_number"`
+	IndividualTaxNumber string `json:"individual_tax_number" validate:"required"`
 }
 
 func (h UsersHandlers) AddDriverLicence() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var input addDriverLicenceInput
+
 		if err := c.Bind(&input); err != nil {
-			return c.JSON(http.StatusBadRequest, err.Error())
+			return c.JSON(http.StatusBadRequest, "input body has not json format")
+		}
+
+		if err := c.Validate(input); err != nil {
+			return c.JSON(http.StatusBadRequest, "invalid input body")
 		}
 
 		userId, ok := c.Get("userId").(string)
