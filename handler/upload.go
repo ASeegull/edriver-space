@@ -2,6 +2,7 @@ package handler
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/ASeegull/edriver-space/config"
 	"github.com/ASeegull/edriver-space/logger"
 	"github.com/ASeegull/edriver-space/model"
@@ -38,10 +39,12 @@ func (u *UploadHandler) UploadXMLFines() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		var data model.Data // Data type stores slice of parking fines
 
+		fmt.Println(ctx.Request().Header)
+
 		err := ctx.Bind(&data) // Bind slice of parking fines from the xml file
 		if err != nil {
 			logger.LogErr(err)
-			return ctx.JSON(http.StatusBadRequest, "invalid input body")
+			return ctx.JSON(http.StatusBadRequest, err.Error())
 		}
 
 		err = u.UploadService.XMLFinesService(ctx.Request().Context(), data)

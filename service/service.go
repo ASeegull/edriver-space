@@ -10,6 +10,8 @@ import (
 	"github.com/ASeegull/edriver-space/repository"
 )
 
+//go:generate mockgen -source=service.go -destination=mocks/mock.go
+
 type Users interface {
 	SignUp(ctx context.Context, user UserSignUpInput) (Tokens, error)
 	SignIn(ctx context.Context, user UserSignInInput) (Tokens, error)
