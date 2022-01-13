@@ -41,7 +41,7 @@ func TestUsersHandlers_SignUp(t *testing.T) {
 				Password:  "12345678",
 			},
 			mockBehavior: func(r *mock_service.MockUsers, input service.UserSignUpInput) {
-				r.EXPECT().SignUp(context.Background(), input).Return(service.Tokens{}, nil).AnyTimes()
+				r.EXPECT().SignUp(context.Background(), input).Return(service.Tokens{}, nil).Times(1)
 			},
 			statusCode:   200,
 			responseBody: fmt.Sprintf("%s\n", `{"accessToken":"","refreshToken":""}`),
@@ -167,7 +167,7 @@ func TestUsersHandlers_SignIn(t *testing.T) {
 				Password: "12345678",
 			},
 			mockBehavior: func(r *mock_service.MockUsers, input service.UserSignInInput) {
-				r.EXPECT().SignIn(context.Background(), input).Return(service.Tokens{}, nil).AnyTimes()
+				r.EXPECT().SignIn(context.Background(), input).Return(service.Tokens{}, nil).Times(1)
 			},
 			statusCode:   200,
 			responseBody: fmt.Sprintf("%s\n", `{"accessToken":"","refreshToken":""}`),
@@ -248,7 +248,7 @@ func TestUsersHandlers_AddDriverLicence(t *testing.T) {
 			requestBody: `{"individual_tax_number": "1111222233334444"}`,
 			serviceInput: service.AddDriverLicenceInput{IndividualTaxNumber: "1111222233334444"},
 			mockBehavior: func(r *mock_service.MockUsers, input service.AddDriverLicenceInput) {
-				r.EXPECT().AddDriverLicence(context.Background(), input, userId).Return(nil).AnyTimes()
+				r.EXPECT().AddDriverLicence(context.Background(), input, userId).Return(nil).Times(1)
 			},
 			statusCode: 200,
 			responseBody: fmt.Sprintf("%q\n", "successfully added"),
