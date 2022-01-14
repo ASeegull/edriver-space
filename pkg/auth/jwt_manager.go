@@ -11,7 +11,7 @@ import (
 // TokenManager provides logic for JWT & Refresh tokens generation and parsing.
 type TokenManager interface {
 	NewJWT(userId, userRole string, ttl time.Duration) (string, error)
-	Parse(accessToken string) (string, error)
+	Parse(accessToken string) (UserClaims, error)
 	NewRefreshToken() (string, error)
 }
 
@@ -45,10 +45,12 @@ func (m *Manager) NewJWT(userId string, userRole string, ttl time.Duration) (str
 	return token.SignedString([]byte(m.signingKey))
 }
 
-//Parse return claims which contain
-// claims["UserId"]
-// claims["UserRole"]
-func (m *Manager) Parse(accessToken string) (string, error) {
+type UserClaims struct {
+	Id   string
+	Role string
+}
+
+func (m *Manager) Parse(accessToken string) (UserClaims, error) {
 	token, err := jwt.Parse(accessToken, func(token *jwt.Token) (i interface{}, err error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -57,15 +59,18 @@ func (m *Manager) Parse(accessToken string) (string, error) {
 		return []byte(m.signingKey), nil
 	})
 	if err != nil {
-		return "", err
+		return UserClaims{}, err
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
-		return "", fmt.Errorf("error get user claims from token")
+		return UserClaims{}, fmt.Errorf("error get user claims from token")
 	}
 
-	return claims["UserRole"].(string), nil
+	return UserClaims{
+		Id:   claims["UserId"].(string),
+		Role: claims["UserRole"].(string),
+	}, nil
 }
 
 func (m *Manager) NewRefreshToken() (string, error) {

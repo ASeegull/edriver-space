@@ -48,13 +48,13 @@ type UserSignUpInput struct {
 	Password  string
 }
 
-func (a *UsersService) SignIn(ctx context.Context, input UserSignInInput) (Tokens, error) {
-	hashPassword, err := a.hasher.Hash(input.Password)
+func (s *UsersService) SignIn(ctx context.Context, input UserSignInInput) (Tokens, error) {
+	hashPassword, err := s.hasher.Hash(input.Password)
 	if err != nil {
 		return Tokens{}, err
 	}
 
-	user, err := a.usersRepos.GetUserByCredentials(ctx, input.Email, hashPassword)
+	user, err := s.usersRepos.GetUserByCredentials(ctx, input.Email, hashPassword)
 	if err != nil {
 		if errors.Is(err, model.ErrUserNotFound) {
 			return Tokens{}, model.ErrUserNotFound
@@ -62,33 +62,33 @@ func (a *UsersService) SignIn(ctx context.Context, input UserSignInInput) (Token
 
 		return Tokens{}, err
 	}
-	return a.createSession(ctx, user.Id)
+	return s.createSession(ctx, user.Id)
 }
 
-func (a UsersService) RefreshTokens(ctx context.Context, sessionId string) (Tokens, error) {
-	userId, err := a.sessionRepos.GetSessionById(ctx, sessionId)
+func (s UsersService) RefreshTokens(ctx context.Context, sessionId string) (Tokens, error) {
+	userId, err := s.sessionRepos.GetSessionById(ctx, sessionId)
 	if err != nil {
 		return Tokens{}, err
 	}
 
-	if err := a.sessionRepos.DeleteSession(ctx, sessionId); err != nil {
+	if err := s.sessionRepos.DeleteSession(ctx, sessionId); err != nil {
 		return Tokens{}, err
 	}
-	return a.createSession(ctx, *userId)
+	return s.createSession(ctx, *userId)
 }
 
-func (a *UsersService) DeleteSession(ctx context.Context, sessionId string) error {
+func (s *UsersService) DeleteSession(ctx context.Context, sessionId string) error {
 
-	return a.sessionRepos.DeleteSession(ctx, sessionId)
+	return s.sessionRepos.DeleteSession(ctx, sessionId)
 }
 
-func (a *UsersService) GetUserById(ctx context.Context, userId string) (*model.User, error) {
+func (s *UsersService) GetUserById(ctx context.Context, userId string) (*model.User, error) {
 
-	return a.usersRepos.GetUserById(ctx, userId)
+	return s.usersRepos.GetUserById(ctx, userId)
 }
 
-func (a *UsersService) SignUp(ctx context.Context, user UserSignUpInput) (Tokens, error) {
-	passwordHash, err := a.hasher.Hash(user.Password)
+func (s *UsersService) SignUp(ctx context.Context, user UserSignUpInput) (Tokens, error) {
+	passwordHash, err := s.hasher.Hash(user.Password)
 	if err != nil {
 		return Tokens{}, err
 	}
@@ -100,14 +100,14 @@ func (a *UsersService) SignUp(ctx context.Context, user UserSignUpInput) (Tokens
 		Password:  &passwordHash,
 	}
 
-	userId, err := a.usersRepos.CreateUser(ctx, newUser)
+	userId, err := s.usersRepos.CreateUser(ctx, newUser)
 	if err != nil {
 		return Tokens{}, err
 	}
-	return a.createSession(ctx, userId)
+	return s.createSession(ctx, userId)
 }
 
-func (a *UsersService) createSession(ctx context.Context, userId string) (Tokens, error) {
+func (s *UsersService) createSession(ctx context.Context, userId string) (Tokens, error) {
 	var (
 		res Tokens
 		err error
@@ -116,15 +116,15 @@ func (a *UsersService) createSession(ctx context.Context, userId string) (Tokens
 	g := new(errgroup.Group)
 
 	g.Go(func() error {
-		accessTokenTTL := time.Duration(a.cfg.TokensTTL.Access) * time.Minute
+		accessTokenTTL := time.Duration(s.cfg.Token.AccessTTL) * time.Minute
 
-		res.AccessToken, err = a.tokenManager.NewJWT(userId, "user", accessTokenTTL)
+		res.AccessToken, err = s.tokenManager.NewJWT(userId, "user", accessTokenTTL)
 
 		return err
 	})
 
 	g.Go(func() error {
-		res.RefreshToken, err = a.tokenManager.NewRefreshToken()
+		res.RefreshToken, err = s.tokenManager.NewRefreshToken()
 
 		return err
 	})
@@ -133,9 +133,22 @@ func (a *UsersService) createSession(ctx context.Context, userId string) (Tokens
 		return Tokens{}, err
 	}
 
-	refreshTokenTTL := time.Duration(a.cfg.TokensTTL.Refresh) * time.Minute
+	refreshTokenTTL := time.Duration(s.cfg.Token.RefreshTTL) * time.Minute
 
-	err = a.sessionRepos.SetSession(ctx, res.RefreshToken, userId, refreshTokenTTL)
+	err = s.sessionRepos.SetSession(ctx, res.RefreshToken, userId, refreshTokenTTL)
 
 	return res, err
+}
+
+type AddDriverLicenceInput struct {
+	IndividualTaxNumber string
+}
+
+func (s *UsersService) AddDriverLicence(ctx context.Context, input AddDriverLicenceInput, userId string) error {
+	licenceNumber, err := s.usersRepos.GetDriverLicence(ctx, input.IndividualTaxNumber)
+	if err != nil {
+		return err
+	}
+
+	return s.usersRepos.UpdateUserDriverLicence(ctx, userId, licenceNumber)
 }
