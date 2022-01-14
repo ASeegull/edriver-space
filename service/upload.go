@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"context"
+	"errors"
 	"github.com/ASeegull/edriver-space/config"
 	"github.com/ASeegull/edriver-space/model"
 	"github.com/ASeegull/edriver-space/repository"
@@ -39,6 +40,7 @@ func (u *UploadService) ReadFinesExcel(ctx context.Context, r *bytes.Reader) err
 	// Open reader
 	excelFile, err := excelize.OpenReader(r)
 	if err != nil {
+		err = errors.New("error opening Excel file")
 		return err
 	}
 
@@ -55,6 +57,7 @@ func (u *UploadService) ReadFinesExcel(ctx context.Context, r *bytes.Reader) err
 	for i := 0; i < excelFile.SheetCount; i++ {
 		rows, err := excelFile.GetRows(excelFile.GetSheetName(i))
 		if err != nil {
+			err = errors.New("error retrieving rows from the file")
 			return err
 		}
 		// Go through all rows
@@ -66,6 +69,7 @@ func (u *UploadService) ReadFinesExcel(ctx context.Context, r *bytes.Reader) err
 			// Convert fine cost from string to int
 			cost, err := strconv.Atoi(row[CostCol])
 			if err != nil {
+				err = errors.New("error converting string to int")
 				return err
 			}
 			// Create new parking fine
