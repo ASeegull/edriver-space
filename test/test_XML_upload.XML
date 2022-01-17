@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+    <parkingFine>
+        <fineNum>123a</fineNum>
+        <issueTime>17.12.21 16:23</issueTime>
+        <carVIN>BC 2304 AB</carVIN>
+        <cost>500</cost>
+        <photo_url>https://1</photo_url>
+    </parkingFine>
+    <parkingFine>
+        <fineNum>237b</fineNum>
+        <issueTime>20.12.21 19:40</issueTime>
+        <carVIN>KA 2343 DB</carVIN>
+        <cost>237</cost>
+        <photo_url>https://2</photo_url>
+    </parkingFine>
+</data>
