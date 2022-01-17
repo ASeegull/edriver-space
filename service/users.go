@@ -152,3 +152,32 @@ func (s *UsersService) AddDriverLicence(ctx context.Context, input AddDriverLice
 
 	return s.usersRepos.UpdateUserDriverLicence(ctx, userId, licenceNumber)
 }
+
+func (s *UsersService) GetFines(ctx context.Context, userId string) (model.Fines, error) {
+	var (
+		err error
+
+		carsFines    []model.CarsFine
+		driversFines []model.DriversFine
+	)
+
+	g, groupCtx := errgroup.WithContext(ctx)
+
+	g.Go(func() error {
+		carsFines, err = s.usersRepos.GetCarsFines(groupCtx, userId)
+
+		return err
+	})
+
+	g.Go(func() error {
+		driversFines, err = s.usersRepos.GetDriversFines(groupCtx, userId)
+
+		return err
+	})
+
+	if err := g.Wait(); err != nil {
+		return model.Fines{}, err
+	}
+
+	return model.Fines{CarsFines: carsFines, DriversFines: driversFines}, nil
+}

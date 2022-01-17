@@ -20,6 +20,7 @@ type Users interface {
 	GetUserById(ctx context.Context, userId string) (*model.User, error)
 	DeleteSession(ctx context.Context, sessionId string) error
 	AddDriverLicence(ctx context.Context, input AddDriverLicenceInput, userId string) error
+	GetFines(ctx context.Context, userId string) (model.Fines, error)
 }
 
 type Uploader interface {

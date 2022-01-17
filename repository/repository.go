@@ -15,6 +15,8 @@ type Users interface {
 	CreateUser(ctx context.Context, newUser model.User) (string, error)
 	GetDriverLicence(ctx context.Context, individualTaxNumber string) (string, error)
 	UpdateUserDriverLicence(ctx context.Context, userId, licenceNumber string) error
+	GetCarsFines(ctx context.Context, userId string) ([]model.CarsFine, error)
+	GetDriversFines(ctx context.Context, userId string) ([]model.DriversFine, error)
 }
 
 type Sessions interface {

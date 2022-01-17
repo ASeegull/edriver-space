@@ -2,6 +2,11 @@ package model
 
 import "encoding/xml"
 
+type Fines struct {
+	DriversFines []DriversFine `json:"drivers_fines"`
+	CarsFines    []CarsFine    `json:"cars_fines"`
+}
+
 type Data struct {
 	XMLName      xml.Name      `xml:"data" json:"-"`
 	ParkingFines []ParkingFine `xml:"parkingFine" json:"parking_fines"`

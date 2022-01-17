@@ -85,3 +85,71 @@ func (r UsersRepos) UpdateUserDriverLicence(ctx context.Context, userId, driverL
 	}
 	return nil
 }
+
+func (r *UsersRepos) GetCarsFines(ctx context.Context, userId string) ([]model.CarsFine, error) {
+	var carsFines []model.CarsFine
+
+	rows, err := r.db.QueryContext(ctx,
+		"SELECT * FROM cars_fines WHERE id IN (SELECT car_id FROM cars_owners WHERE user_id = $1)", userId)
+	if err != nil {
+		return []model.CarsFine{}, err
+	}
+
+	for rows.Next() {
+		var carsFine model.CarsFine
+
+		if err := rows.Scan(
+			&carsFine.Id,
+			&carsFine.VehicleRegistrationNumber,
+			&carsFine.DaraAndTime,
+			&carsFine.Place,
+			&carsFine.FileLawArticle,
+			&carsFine.Price,
+			&carsFine.Info,
+			&carsFine.ImdUrl,
+		); err != nil {
+			return []model.CarsFine{}, err
+		}
+
+		carsFines = append(carsFines, carsFine)
+	}
+
+	if err := rows.Close(); err != nil {
+		return []model.CarsFine{}, err
+	}
+
+	return carsFines, nil
+}
+
+func (r *UsersRepos) GetDriversFines(ctx context.Context, userId string) ([]model.DriversFine, error) {
+	var driversFines []model.DriversFine
+
+	rows, err := r.db.QueryContext(ctx, "SELECT * FROM drivers_fines WHERE licence_number IN (SELECT driver_licence_number FROM users WHERE id = $1)", userId)
+	if err != nil {
+		return []model.DriversFine{}, err
+	}
+
+	for rows.Next() {
+		var driversFine model.DriversFine
+
+		if err := rows.Scan(
+			&driversFine.Id,
+			&driversFine.LicenceNumber,
+			&driversFine.DataAndTime,
+			&driversFine.Place,
+			&driversFine.FileLawArticle,
+			&driversFine.Price,
+			&driversFine.VehicleRegistrationNumber,
+		); err != nil {
+			return []model.DriversFine{}, err
+		}
+
+		driversFines = append(driversFines, driversFine)
+	}
+
+	if err := rows.Close(); err != nil {
+		return []model.DriversFine{}, err
+	}
+
+	return driversFines, nil
+}
