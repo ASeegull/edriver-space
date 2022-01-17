@@ -34,6 +34,7 @@ func (h *UsersHandlers) InitUsersRoutes(e *echo.Group, mw middleware.Middleware)
 	authenticated := users.Group("/", mw.UserIdentity())
 
 	authenticated.POST("add-driver-licence", h.AddDriverLicence())
+	authenticated.GET("fines", h.GetFines())
 }
 
 type singInInput struct {
@@ -197,6 +198,21 @@ func (h UsersHandlers) AddDriverLicence() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, err.Error())
 		}
 		return c.JSON(http.StatusOK, "successfully added")
+	}
+}
+
+func (h *UsersHandlers) GetFines() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		userId, ok := c.Get("userId").(string)
+		if !ok {
+			return c.JSON(http.StatusForbidden, "user id not present in context")
+		}
+
+		fines, err := h.usersService.GetFines(c.Request().Context(), userId)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, err)
+		}
+		return c.JSON(http.StatusOK, fines)
 	}
 }
 

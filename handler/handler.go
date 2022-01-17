@@ -14,6 +14,7 @@ type Users interface {
 	SignOut() echo.HandlerFunc
 	RefreshTokens() echo.HandlerFunc
 	AddDriverLicence() echo.HandlerFunc
+	GetFines() echo.HandlerFunc
 }
 
 // Uploader provides methods to upload fines on the server
