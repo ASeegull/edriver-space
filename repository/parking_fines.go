@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"github.com/ASeegull/edriver-space/model"
 )
 
@@ -20,6 +21,7 @@ func (u *ParkingFinesRepos) AddParkingFine(ctx context.Context, fine model.Parki
 	_, err := u.DB.ExecContext(ctx, "INSERT INTO cars_parking_fines(fine_num, issue_time, car_VIN, cost, photo_url) VALUES ($1, $2, $3, $4, $5)",
 		fine.FineNum, fine.IssueTime, fine.CarVIN, fine.Cost, fine.PhotoURL)
 	if err != nil {
+		err = errors.New("error adding parking fine to the database")
 		return err
 	}
 	return nil
@@ -32,6 +34,7 @@ func (u *ParkingFinesRepos) GetParkingFine(ctx context.Context, id string) (*mod
 	err := u.DB.QueryRowContext(ctx, "SELECT * FROM cars_parking_fines WHERE id = $1", id).Scan(
 		&parkingFine.ID, &parkingFine.FineNum, &parkingFine.IssueTime, &parkingFine.CarVIN, &parkingFine.Cost, &parkingFine.PhotoURL)
 	if err != nil {
+		err = errors.New("error retrieving parking fine from the database")
 		return nil, err
 	}
 	return &parkingFine, nil
@@ -43,6 +46,7 @@ func (u *ParkingFinesRepos) GetParkingFines(ctx context.Context) ([]model.Parkin
 
 	rows, err := u.DB.QueryContext(ctx, "SELECT * FROM cars_parking_fines")
 	if err != nil {
+		err = errors.New("error retrieving rows from the database")
 		return nil, err
 	}
 
@@ -50,6 +54,7 @@ func (u *ParkingFinesRepos) GetParkingFines(ctx context.Context) ([]model.Parkin
 		parkingFine := model.ParkingFine{} // Store data of each parking fine
 		err = rows.Scan(&parkingFine.ID, &parkingFine.FineNum, &parkingFine.IssueTime, &parkingFine.CarVIN, &parkingFine.Cost, &parkingFine.PhotoURL)
 		if err != nil {
+			err = errors.New("error scanning the parking fine data from rows")
 			return nil, err
 		}
 		// Add received parking fine to parking fine slice
@@ -58,9 +63,7 @@ func (u *ParkingFinesRepos) GetParkingFines(ctx context.Context) ([]model.Parkin
 
 	// Close rows and check errors
 	if err = rows.Close(); err != nil {
-		return nil, err
-	}
-	if err = rows.Err(); err != nil {
+		err = errors.New("error closing rows")
 		return nil, err
 	}
 
@@ -71,6 +74,7 @@ func (u *ParkingFinesRepos) GetParkingFines(ctx context.Context) ([]model.Parkin
 func (u *ParkingFinesRepos) DeleteParkingFine(ctx context.Context, id string) error {
 	_, err := u.DB.ExecContext(ctx, "DELETE FROM cars_parking_fines WHERE id = $1", id)
 	if err != nil {
+		err = errors.New("error removing parking fine from the database")
 		return err
 	}
 	return nil

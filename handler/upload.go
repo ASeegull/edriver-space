@@ -117,6 +117,6 @@ func (u *UploadHandler) UploadExcel() echo.HandlerFunc {
 			return ctx.JSON(http.StatusInternalServerError, err.Error())
 		}
 
-		return ctx.String(http.StatusOK, "All fines successfully added.")
+		return ctx.JSON(http.StatusOK, "All fines successfully added")
 	}
 }

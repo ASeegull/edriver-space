@@ -13,12 +13,13 @@ type Data struct {
 }
 
 type ParkingFine struct {
-	ID        string `json:"id"`
-	FineNum   string `xml:"fineNum" json:"fine_num"`
-	IssueTime string `xml:"issueTime" json:"issue_time"`
-	CarVIN    string `xml:"carVIN" json:"car_VIN"`
-	Cost      int    `xml:"cost" json:"cost"`
-	PhotoURL  string `xml:"photo_url" json:"photo_url"`
+	XMLName   xml.Name `xml:"parkingFine"`
+	ID        string   `json:"id"`
+	FineNum   string   `xml:"fineNum" json:"fine_num"`
+	IssueTime string   `xml:"issueTime" json:"issue_time"`
+	CarVIN    string   `xml:"carVIN" json:"car_VIN"`
+	Cost      int      `xml:"cost" json:"cost"`
+	PhotoURL  string   `xml:"photo_url" json:"photo_url"`
 }
 
 func MakeParkingFine(FineNum, IssueTime, CarID string, Cost int, PhotoURL string) ParkingFine {

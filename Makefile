@@ -34,3 +34,7 @@ test:
 test-coverage:
 	- rm -rf *.out  # Remove all coverage files if exists
 	go test -race -failfast -tags=integration -coverprofile=coverage-all.out ./...
+
+gen:
+	mockgen -source=service/service.go -destination=service/mocks/mock.go
+	mockgen -source=repository/repository.go -destination=repository/mocks/mock.go
