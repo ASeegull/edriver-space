@@ -14,6 +14,7 @@ func UpUsersFines(tx *sql.Tx) error {
 		(
 		    id							 SERIAL,
 			licence_number               VARCHAR(55)  NOT NULL,
+    		fine_num 			         VARCHAR(55) UNIQUE NOT NULL,
 			date_and_time                DATE         NOT NULL,
 			place                        VARCHAR(255) NOT NULL,
 			file_law_article             VARCHAR(30)  NOT NULL,

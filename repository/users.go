@@ -101,7 +101,8 @@ func (r *UsersRepos) GetCarsFines(ctx context.Context, userId string) ([]model.C
 		if err := rows.Scan(
 			&carsFine.Id,
 			&carsFine.VehicleRegistrationNumber,
-			&carsFine.DaraAndTime,
+			&carsFine.FineNum,
+			&carsFine.DataAndTime,
 			&carsFine.Place,
 			&carsFine.FileLawArticle,
 			&carsFine.Price,
@@ -135,6 +136,7 @@ func (r *UsersRepos) GetDriversFines(ctx context.Context, userId string) ([]mode
 		if err := rows.Scan(
 			&driversFine.Id,
 			&driversFine.LicenceNumber,
+			&driversFine.FineNum,
 			&driversFine.DataAndTime,
 			&driversFine.Place,
 			&driversFine.FileLawArticle,
