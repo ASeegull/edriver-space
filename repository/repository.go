@@ -46,21 +46,36 @@ type Drivers interface {
 	DeleteDriver(ctx context.Context, id string) error
 }
 
+type DriverFines interface {
+	GetDriverFines(ctx context.Context, licence string) ([]model.DriversFine, error)
+	GetDriverFine(ctx context.Context, licence string) (*model.DriversFine, error)
+	DeleteDriverFine(ctx context.Context, licence string) error
+}
+
+type CarFines interface {
+	GetCarFines(ctx context.Context, regNum string) ([]model.CarsFine, error)
+	GetCarFine(ctx context.Context, regNum string) (*model.CarsFine, error)
+	DeleteCarFine(ctx context.Context, fineNum string) error
+}
+
 type Repositories struct {
 	Users        Users
 	Sessions     Sessions
 	Cars         Cars
 	Drivers      Drivers
 	ParkingFines ParkingFines
+	DriverFines  DriverFines
+	CarFines     CarFines
 }
 
 func NewRepositories(postgres *sql.DB, redis *redis.Client) *Repositories {
 	return &Repositories{
-
 		Users:        NewUsersRepos(postgres),
 		Sessions:     NewSessionsRepos(redis),
 		ParkingFines: NewParkingFinesRepos(postgres),
 		Cars:         NewCarsRepos(postgres),
 		Drivers:      NewDriversRepos(postgres),
+		DriverFines:  NewDriverFinesRep(postgres),
+		CarFines:     NewCarFinesRep(postgres),
 	}
 }

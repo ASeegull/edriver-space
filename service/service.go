@@ -26,6 +26,15 @@ type Uploader interface {
 	ReadFinesExcel(ctx context.Context, r *bytes.Reader) error
 }
 
+type Police interface {
+	GetFinesDriverLicense(ctx context.Context, licence string) ([]model.DriversFine, error)
+	GetFinesCarRegNum(ctx context.Context, regNum string) ([]model.CarsFine, error)
+	GetDriverFine(ctx context.Context, fineNum string) (*model.DriversFine, error)
+	GetCarFine(ctx context.Context, fineNum string) (*model.CarsFine, error)
+	RemoveDriverFine(ctx context.Context, fineNum string) error
+	RemoveCarFine(ctx context.Context, fineNum string) error
+}
+
 type Cars interface {
 	CreateCar(ctx context.Context, car *model.Car) (*model.Car, error)
 	GetCar(ctx context.Context, id string) (*model.Car, error)
@@ -45,6 +54,7 @@ type Services struct {
 	Uploader Uploader
 	Cars     Cars
 	Drivers  Drivers
+	Police   Police
 }
 
 func NewServices(repos *repository.Repositories, tokenManager auth.TokenManager, hasher hash.PasswordHasher, cfg *config.Config) *Services {
@@ -53,5 +63,6 @@ func NewServices(repos *repository.Repositories, tokenManager auth.TokenManager,
 		Uploader: NewUploadService(repos, cfg),
 		Cars:     NewCarService(cfg, repos.Cars),
 		Drivers:  NewDriverService(cfg, repos.Drivers),
+		Police:   NewPoliceService(repos, cfg),
 	}
 }
