@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"github.com/ASeegull/edriver-space/config"
 	"github.com/ASeegull/edriver-space/logger"
+	"github.com/ASeegull/edriver-space/middleware"
 	"github.com/ASeegull/edriver-space/model"
 	"github.com/ASeegull/edriver-space/service"
 	"github.com/labstack/echo/v4"
@@ -25,9 +26,9 @@ func NewUploadHandler(UploadService service.Uploader, cfg *config.Config) *Uploa
 	}
 }
 
-func (u *UploadHandler) InitUploaderRoutes(e *echo.Group) {
+func (u *UploadHandler) InitUploaderRoutes(e *echo.Group, mw middleware.Middleware) {
 	// Upload routes (secure access)
-	upload := e.Group("/upload")
+	upload := e.Group("/upload", mw.JWTAuthorization("police"))
 
 	upload.POST("/XML", u.UploadXMLFines()) // Upload XML fines data to the server
 	upload.POST("/Excel", u.UploadExcel())

@@ -19,7 +19,7 @@ type Users interface {
 
 // Uploader provides methods to upload fines on the server
 type Uploader interface {
-	InitUploaderRoutes(e *echo.Group)
+	InitUploaderRoutes(e *echo.Group, mw middleware.Middleware)
 	UploadXMLFines() echo.HandlerFunc
 	UploadExcel() echo.HandlerFunc
 }
@@ -40,12 +40,20 @@ type Cars interface {
 	DeleteCar() echo.HandlerFunc
 }
 
+type Police interface {
+	InitPoliceRoutes(e *echo.Group, mw middleware.Middleware)
+	GetFines() echo.HandlerFunc
+	RemoveFine() echo.HandlerFunc
+	GetFine() echo.HandlerFunc
+}
+
 // Handlers stores all handlers
 type Handlers struct {
 	Users   Users
 	Upload  Uploader
 	Drivers Drivers
 	Cars    Cars
+	Police  Police
 }
 
 // NewHandlers returns a pointer to new Handlers
@@ -55,12 +63,14 @@ func NewHandlers(services *service.Services, cfg *config.Config) *Handlers {
 		Upload:  NewUploadHandler(services.Uploader, cfg),
 		Drivers: NewDriverHandlers(services.Drivers, cfg),
 		Cars:    NewCarsHandlers(services.Cars, cfg),
+		Police:  NewPoliceHandler(services.Police, cfg),
 	}
 }
 
 func (h *Handlers) InitRoutes(e *echo.Group, mw middleware.Middleware) {
 	h.Users.InitUsersRoutes(e, mw)
-	h.Upload.InitUploaderRoutes(e)
+	h.Upload.InitUploaderRoutes(e, mw)
 	h.Drivers.InitDriversRoutes(e)
 	h.Cars.InitCarsRoutes(e)
+	h.Police.InitPoliceRoutes(e, mw)
 }

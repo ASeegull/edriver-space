@@ -13,14 +13,15 @@ func init() {
 func UpCarsFines(tx *sql.Tx) error {
 	query := `CREATE TABLE IF NOT EXISTS cars_fines
 		(
-		    id							 SERIAL,
-			vehicle_registration_number  VARCHAR(25)  NOT NULL,
-            date_and_time                DATE         NOT NULL,
-            place                        VARCHAR(255) NOT NULL,
-            file_law_article             VARCHAR(30)  NOT NULL,
-            price                        INT          NOT NULL,
-            info                         VARCHAR(255),
-            img_url                      VARCHAR(255),
+		    id							 	SERIAL,
+			vehicle_registration_number	VARCHAR(25)  NOT NULL,
+    		fine_num 					VARCHAR(55) UNIQUE NOT NULL,
+            date_and_time               DATE         NOT NULL,
+            place                       VARCHAR(255) NOT NULL,
+            file_law_article            VARCHAR(30)  NOT NULL,
+            price                       INT          NOT NULL,
+            info                        VARCHAR(255),
+            img_url                     VARCHAR(255),
             FOREIGN KEY (vehicle_registration_number) REFERENCES cars (registration_number)
 		);`
 	_, err := tx.Exec(query)

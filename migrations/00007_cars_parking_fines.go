@@ -13,7 +13,7 @@ func UpCarsParkingFines(tx *sql.Tx) error {
 	query := `CREATE TABLE IF NOT EXISTS cars_parking_fines
 		(
 			id 			SERIAL PRIMARY KEY,
-			fine_num 	VARCHAR(55) NOT NULL,
+			fine_num 	VARCHAR(55) UNIQUE NOT NULL,
     		issue_time 	VARCHAR(55) NOT NULL,
     		car_VIN 	VARCHAR(55) UNIQUE NOT NULL,
     		cost 		INT NOT NULL,
