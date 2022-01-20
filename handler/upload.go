@@ -39,7 +39,7 @@ func (u *UploadHandler) UploadXMLFines() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		var data model.Data // Data type stores slice of parking fines
 
-		err := ctx.Bind(&data) // Bind slice of parking fines from the xml file
+		err := ctx.Bind(&data) // Bind slice of fines from the xml file
 		if err != nil {
 			logger.LogErr(err)
 			return ctx.JSON(http.StatusBadRequest, "invalid input body")
@@ -50,7 +50,7 @@ func (u *UploadHandler) UploadXMLFines() echo.HandlerFunc {
 			logger.LogErr(err)
 			return ctx.JSON(http.StatusInternalServerError, err.Error())
 		}
-		return ctx.JSON(http.StatusOK, "Parking fines data successfully uploaded")
+		return ctx.JSON(http.StatusOK, "Fines data successfully uploaded")
 	}
 }
 

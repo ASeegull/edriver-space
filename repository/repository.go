@@ -25,13 +25,6 @@ type Sessions interface {
 	DeleteSession(ctx context.Context, sessionId string) error
 }
 
-type ParkingFines interface {
-	GetParkingFine(ctx context.Context, id string) (*model.ParkingFine, error)
-	GetParkingFines(ctx context.Context) ([]model.ParkingFine, error)
-	AddParkingFine(ctx context.Context, fine model.ParkingFine) error
-	DeleteParkingFine(ctx context.Context, id string) error
-}
-
 type Cars interface {
 	GetCar(ctx context.Context, id string) (*model.Car, error)
 	GetCars(ctx context.Context) (*[]model.Car, error)
@@ -49,33 +42,33 @@ type Drivers interface {
 type DriverFines interface {
 	GetDriverFines(ctx context.Context, licence string) ([]model.DriversFine, error)
 	GetDriverFine(ctx context.Context, licence string) (*model.DriversFine, error)
+	AddDriverFine(ctx context.Context, fine *model.DriversFine) error
 	DeleteDriverFine(ctx context.Context, licence string) error
 }
 
 type CarFines interface {
 	GetCarFines(ctx context.Context, regNum string) ([]model.CarsFine, error)
 	GetCarFine(ctx context.Context, regNum string) (*model.CarsFine, error)
+	AddCarFine(ctx context.Context, fine *model.CarsFine) error
 	DeleteCarFine(ctx context.Context, fineNum string) error
 }
 
 type Repositories struct {
-	Users        Users
-	Sessions     Sessions
-	Cars         Cars
-	Drivers      Drivers
-	ParkingFines ParkingFines
-	DriverFines  DriverFines
-	CarFines     CarFines
+	Users       Users
+	Sessions    Sessions
+	Cars        Cars
+	Drivers     Drivers
+	DriverFines DriverFines
+	CarFines    CarFines
 }
 
 func NewRepositories(postgres *sql.DB, redis *redis.Client) *Repositories {
 	return &Repositories{
-		Users:        NewUsersRepos(postgres),
-		Sessions:     NewSessionsRepos(redis),
-		ParkingFines: NewParkingFinesRepos(postgres),
-		Cars:         NewCarsRepos(postgres),
-		Drivers:      NewDriversRepos(postgres),
-		DriverFines:  NewDriverFinesRep(postgres),
-		CarFines:     NewCarFinesRep(postgres),
+		Users:       NewUsersRepos(postgres),
+		Sessions:    NewSessionsRepos(redis),
+		Cars:        NewCarsRepos(postgres),
+		Drivers:     NewDriversRepos(postgres),
+		DriverFines: NewDriverFinesRep(postgres),
+		CarFines:    NewCarFinesRep(postgres),
 	}
 }

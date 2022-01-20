@@ -29,7 +29,6 @@ func TestUploadHandler_UploadXMLFines(t *testing.T) {
 	}
 
 	xmlNameData := xml.Name{Local: "data"}
-	xmlNameFine := xml.Name{Local: "parkingFine"}
 
 	testTable := []struct {
 		name                 string
@@ -55,16 +54,24 @@ func TestUploadHandler_UploadXMLFines(t *testing.T) {
 			inputBody: data,
 			inputData: model.Data{
 				XMLName: xmlNameData,
-				ParkingFines: []model.ParkingFine{
-					{XMLName: xmlNameFine, FineNum: "123a", IssueTime: "17.12.21 16:23", CarVIN: "BC 2304 AB", Cost: 500, PhotoURL: "https://1"},
-					{XMLName: xmlNameFine, FineNum: "237b", IssueTime: "20.12.21 19:40", CarVIN: "KA 2343 DB", Cost: 237, PhotoURL: "https://2"},
+				CarsFines: []model.CarsFine{
+					{VehicleRegistrationNumber: "RegNum1",
+						FineNum: "fineNum1", DataAndTime: "20.01.22 18:30",
+						Place: "Lviv", FileLawArticle: "fileLawArticle1",
+						Price: 500, Info: "info1", ImdUrl: "https://1",
+					},
+					{VehicleRegistrationNumber: "RegNum2",
+						FineNum: "fineNum2", DataAndTime: "22.01.22 18:30",
+						Place: "Kyiv", FileLawArticle: "fileLawArticle2",
+						Price: 700, Info: "info2", ImdUrl: "https://2",
+					},
 				}},
 			inputContext: context.Background(),
 			mockBehavior: func(s *mock_service.MockUploader, ctx context.Context, data model.Data) {
 				s.EXPECT().XMLFinesService(ctx, data).Return(nil).AnyTimes()
 			},
 			expectedStatusCode:   200,
-			expectedResponseBody: "\"Parking fines data successfully uploaded\"\n",
+			expectedResponseBody: "\"Fines data successfully uploaded\"\n",
 		},
 	}
 
