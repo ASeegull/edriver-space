@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"github.com/ASeegull/edriver-space/model"
 )
@@ -20,46 +21,46 @@ func NewCarsRepos(db *sql.DB) *CarsRepos {
 
 func (c *CarsRepos) CreateCar(ctx context.Context, car *model.Car) (*model.Car, error) {
 	query := `INSERT INTO cars(
-		name, 
-		VIN_code, 
-		registration_number, 
-		vehicle_category, 
-		make,
-		type, 
-		commercial_description,
-		maximum_mass, 
-		mass_of_the_vehicle_in_service, 
-		capacity, 
-		colour_of_the_vehicle, 
-		number_of_seats_including_drivers_seat, 
-		date_of_first_registration, 
-		period_of_validity, 
-		date_of_registration,
-		full_name, 
-		address, 
-		ownership) 
+		    id,
+            make,
+            type,
+            commercial_description,
+            VIN_code,
+            maximum_mass,
+            mass_of_the_vehicle_in_service,
+            vehicle_category,
+            capacity,
+            colour_of_the_vehicle,
+            number_of_seats_including_drivers_seat,
+            registration_number,
+            date_of_first_registration,
+            full_name,
+            address,
+            ownership,
+            period_of_validity,
+            date_of_registration) 
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 
 			$12, $13, $14, $15, $16, $17, $18)`
 	_, err := c.db.ExecContext(ctx, query,
 		car.ID,
-		car.Name,
-		car.VIN,
-		car.RegistrationNum,
-		car.VehicleCategory,
 		car.Make,
 		car.Type,
 		car.CommercialDescription,
+		car.VIN,
 		car.MaxMass,
 		car.ServiceMass,
+		car.VehicleCategory,
 		car.Capacity,
 		car.Colour,
 		car.SeatsNum,
+		car.RegistrationNum,
 		car.FirstRegDate,
-		car.ValidityPeriod,
-		car.RegistrationDate,
 		car.FullName,
 		car.Address,
-		car.Ownership)
+		car.Ownership,
+		car.ValidityPeriod,
+		car.RegistrationDate,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -76,29 +77,29 @@ func (c *CarsRepos) GetCar(ctx context.Context, id string) (*model.Car, error) {
 
 	err := c.db.QueryRowContext(ctx, query, id).Scan(
 		&car.ID,
-		&car.Name,
-		&car.VIN,
-		&car.RegistrationNum,
-		&car.VehicleCategory,
 		&car.Make,
 		&car.Type,
 		&car.CommercialDescription,
+		&car.VIN,
 		&car.MaxMass,
 		&car.ServiceMass,
+		&car.VehicleCategory,
 		&car.Capacity,
 		&car.Colour,
 		&car.SeatsNum,
+		&car.RegistrationNum,
 		&car.FirstRegDate,
-		&car.ValidityPeriod,
-		&car.RegistrationDate,
 		&car.FullName,
 		&car.Address,
-		&car.Ownership)
+		&car.Ownership,
+		&car.ValidityPeriod,
+		&car.RegistrationDate)
+
 	if err != nil {
-		// Return empty object and error.
+		err = errors.New("error retrieving car id from the database")
 		return nil, err
 	}
-	return &model.Car{}, nil
+	return &car, nil
 }
 
 func (c CarsRepos) GetCars(ctx context.Context) (*[]model.Car, error) {
@@ -114,24 +115,25 @@ func (c CarsRepos) GetCars(ctx context.Context) (*[]model.Car, error) {
 		car := model.Car{}
 		err = rows.Scan(
 			&car.ID,
-			&car.Name,
-			&car.VIN,
-			&car.RegistrationNum,
-			&car.VehicleCategory,
 			&car.Make,
 			&car.Type,
 			&car.CommercialDescription,
+			&car.VIN,
 			&car.MaxMass,
 			&car.ServiceMass,
+			&car.VehicleCategory,
 			&car.Capacity,
 			&car.Colour,
 			&car.SeatsNum,
+			&car.RegistrationNum,
 			&car.FirstRegDate,
-			&car.ValidityPeriod,
-			&car.RegistrationDate,
 			&car.FullName,
 			&car.Address,
-			&car.Ownership)
+			&car.Ownership,
+			&car.ValidityPeriod,
+			&car.RegistrationDate,
+		)
+
 		if err != nil {
 			return nil, err
 		}
