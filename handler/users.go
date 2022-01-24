@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"github.com/ASeegull/edriver-space/logger"
 	"net/http"
 
 	"github.com/ASeegull/edriver-space/config"
@@ -35,6 +36,8 @@ func (h *UsersHandlers) InitUsersRoutes(e *echo.Group, mw middleware.Middleware)
 
 	authenticated.POST("add-driver-licence", h.AddDriverLicence())
 	authenticated.GET("fines", h.GetFines())
+	authenticated.DELETE("/fines", h.PayAllFines()) // Pay all user fines
+	authenticated.DELETE("/fine", h.PayFine())      // Pay specific user fine
 }
 
 type singInInput struct {
@@ -235,5 +238,65 @@ func (h *UsersHandlers) deleteCookie() *http.Cookie {
 		Path:     h.cfg.Cookie.Path,
 		HttpOnly: h.cfg.Cookie.HTTPOnly,
 		Secure:   h.cfg.Cookie.Secure,
+	}
+}
+
+// PayAllFines allows user to pay all his fines
+func (h *UsersHandlers) PayAllFines() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		// Get user id from the context
+		userId, ok := ctx.Get("userId").(string)
+		if !ok {
+			return ctx.JSON(http.StatusForbidden, "user id not present in context")
+		}
+
+		// Get all users fines
+		fines, err := h.usersService.GetFines(ctx.Request().Context(), userId)
+		if err != nil {
+			logger.LogErr(err)
+			return ctx.JSON(http.StatusInternalServerError, err)
+		}
+
+		// Pass fines to service layer
+		err = h.usersService.PayFines(ctx.Request().Context(), fines)
+		if err != nil {
+			logger.LogErr(err)
+			return ctx.JSON(http.StatusPaymentRequired, err.Error())
+		}
+		return ctx.JSON(http.StatusOK, "All fines payed successfully")
+	}
+}
+
+// PayFine allows user to pay specific fine by its fine number
+func (h *UsersHandlers) PayFine() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		// Get user id from the context
+		userId, ok := ctx.Get("userId").(string)
+		if !ok {
+			return ctx.JSON(http.StatusForbidden, "user id not present in context")
+		}
+
+		// Get fine number from query parameter
+		fineNum := ctx.QueryParam("fineNum")
+		if fineNum == "" {
+			err := errors.New("fine number not specified")
+			logger.LogErr(err)
+			return ctx.JSON(http.StatusPreconditionRequired, err.Error())
+		}
+
+		// Get all users fines
+		fines, err := h.usersService.GetFines(ctx.Request().Context(), userId)
+		if err != nil {
+			logger.LogErr(err)
+			return ctx.JSON(http.StatusInternalServerError, err)
+		}
+
+		// Call service layer
+		err = h.usersService.PayFine(ctx.Request().Context(), fines, fineNum)
+		if err != nil {
+			logger.LogErr(err)
+			return ctx.JSON(http.StatusInternalServerError, err.Error())
+		}
+		return ctx.JSON(http.StatusOK, "Your fine was successfully payed")
 	}
 }

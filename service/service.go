@@ -21,6 +21,8 @@ type Users interface {
 	DeleteSession(ctx context.Context, sessionId string) error
 	AddDriverLicence(ctx context.Context, input AddDriverLicenceInput, userId string) error
 	GetFines(ctx context.Context, userId string) (model.Fines, error)
+	PayFines(ctx context.Context, fines model.Fines) error
+	PayFine(ctx context.Context, fines model.Fines, fineNum string) error
 }
 
 type Uploader interface {
@@ -61,7 +63,7 @@ type Services struct {
 
 func NewServices(repos *repository.Repositories, tokenManager auth.TokenManager, hasher hash.PasswordHasher, cfg *config.Config) *Services {
 	return &Services{
-		Users:    NewUsersService(repos.Users, repos.Sessions, tokenManager, hasher, cfg),
+		Users:    NewUsersService(repos.Users, repos.Sessions, repos.CarFines, repos.DriverFines, tokenManager, hasher, cfg),
 		Uploader: NewUploadService(repos, cfg),
 		Cars:     NewCarService(cfg, repos.Cars),
 		Drivers:  NewDriverService(cfg, repos.Drivers),

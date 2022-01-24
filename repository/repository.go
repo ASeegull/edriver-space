@@ -43,7 +43,7 @@ type DriverFines interface {
 	GetDriverFines(ctx context.Context, licence string) ([]model.DriversFine, error)
 	GetDriverFine(ctx context.Context, licence string) (*model.DriversFine, error)
 	AddDriverFine(ctx context.Context, fine *model.DriversFine) error
-	DeleteDriverFine(ctx context.Context, licence string) error
+	DeleteDriverFine(ctx context.Context, fineNum string) error
 }
 
 type CarFines interface {
