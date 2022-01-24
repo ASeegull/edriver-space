@@ -61,6 +61,26 @@ func (cfr *CarFinesRep) GetCarFine(ctx context.Context, regNum string) (*model.C
 	return &carFine, nil
 }
 
+// AddCarFine adds new car fine to the database
+func (cfr *CarFinesRep) AddCarFine(ctx context.Context, fine *model.CarsFine) error {
+	query := `INSERT INTO cars_fines(
+                       vehicle_registration_number,
+                       fine_num,
+                       date_and_time,
+                       place,
+                       file_law_article,
+                       price,
+                       info,
+                       img_url) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
+	_, err := cfr.DB.ExecContext(ctx, query,
+		fine.VehicleRegistrationNumber, fine.FineNum, fine.DataAndTime, fine.Place, fine.FileLawArticle, fine.Price, fine.Info, fine.ImdUrl)
+	if err != nil {
+		err = errors.New("error adding car fine to the database")
+		return err
+	}
+	return nil
+}
+
 // DeleteCarFine removes car fine with the given fine number
 func (cfr *CarFinesRep) DeleteCarFine(ctx context.Context, fineNum string) error {
 	_, err := cfr.DB.ExecContext(ctx, "DELETE FROM cars_fines WHERE fine_num = $1", fineNum)

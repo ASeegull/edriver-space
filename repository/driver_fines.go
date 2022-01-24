@@ -61,6 +61,25 @@ func (dfr *DriverFinesRep) GetDriverFine(ctx context.Context, licence string) (*
 	return &driverFine, nil
 }
 
+// AddDriverFine adds new driver fine to the database
+func (dfr *DriverFinesRep) AddDriverFine(ctx context.Context, fine *model.DriversFine) error {
+	query := `INSERT INTO drivers_fines(
+                       licence_number,
+                       fine_num,
+                       date_and_time,
+                       place,
+                       file_law_article,
+                       price,
+                       vehicle_registration_number) VALUES ($1, $2, $3, $4, $5, $6, $7)`
+	_, err := dfr.DB.ExecContext(ctx, query,
+		fine.LicenceNumber, fine.FineNum, fine.DataAndTime, fine.Place, fine.FileLawArticle, fine.Price, fine.VehicleRegistrationNumber)
+	if err != nil {
+		err = errors.New("error adding driver fine to the database")
+		return err
+	}
+	return nil
+}
+
 // DeleteDriverFine removes driver fine with given fine number
 func (dfr *DriverFinesRep) DeleteDriverFine(ctx context.Context, fineNum string) error {
 	_, err := dfr.DB.ExecContext(ctx, "DELETE FROM drivers_fines WHERE fine_num = $1", fineNum)

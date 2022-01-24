@@ -14,19 +14,19 @@ import (
 
 // UploadService stores upload logic
 type UploadService struct {
-	ParkingFinesRepos repository.ParkingFines
-	cfg               *config.Config
+	CarFinesRepos repository.CarFines
+	cfg           *config.Config
 }
 
 // NewUploadService returns a pointer to new UploadService
 func NewUploadService(repos *repository.Repositories, cfg *config.Config) *UploadService {
-	return &UploadService{ParkingFinesRepos: repos.ParkingFines, cfg: cfg}
+	return &UploadService{CarFinesRepos: repos.CarFines, cfg: cfg}
 }
 
-// XMLFinesService goes through all fines in data and passes each to the database query
+// XMLFinesService goes through all car fines in data and passes each to the database query
 func (u *UploadService) XMLFinesService(ctx context.Context, data model.Data) error {
-	for _, fine := range data.ParkingFines {
-		err := u.ParkingFinesRepos.AddParkingFine(ctx, fine) // Adding each fine to the database
+	for _, fine := range data.CarsFines {
+		err := u.CarFinesRepos.AddCarFine(ctx, &fine) // Adding each fine to the database
 		if err != nil {
 			return err
 		}
@@ -46,10 +46,13 @@ func (u *UploadService) ReadFinesExcel(ctx context.Context, r *bytes.Reader) err
 
 	// Indexes for getting data from rows
 	const (
-		FineNumCol = iota // 0
-		IssueTimeCol
-		CarVINCol
-		CostCol
+		regNumCol = iota // 0
+		fineNumCol
+		dateCol
+		placeCol
+		FLACol
+		priceCol
+		infoCol
 		URLCol
 	)
 
@@ -63,20 +66,20 @@ func (u *UploadService) ReadFinesExcel(ctx context.Context, r *bytes.Reader) err
 		// Go through all rows
 		for _, row := range rows {
 			// Skip the first row with designation info
-			if strings.ToLower(row[FineNumCol]) == "id" {
+			if strings.ToLower(row[regNumCol]) == "regnum" {
 				continue
 			}
-			// Convert fine cost from string to int
-			cost, err := strconv.Atoi(row[CostCol])
+			// Convert fine price from string to int
+			price, err := strconv.Atoi(row[priceCol])
 			if err != nil {
 				err = errors.New("error converting string to int")
 				return err
 			}
-			// Create new parking fine
-			parkingFine := model.MakeParkingFine(row[FineNumCol], row[IssueTimeCol], row[CarVINCol], cost, row[URLCol])
+			// Create new car fine
+			carFine := model.NewCarsFine(row[regNumCol], row[fineNumCol], row[dateCol], row[placeCol], row[FLACol], price, row[infoCol], row[URLCol])
 
-			// Pass parking fine to the database query
-			err = u.ParkingFinesRepos.AddParkingFine(ctx, parkingFine)
+			// Pass car fine to the database query
+			err = u.CarFinesRepos.AddCarFine(ctx, carFine)
 			if err != nil {
 				return err
 			}

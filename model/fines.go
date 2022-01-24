@@ -8,20 +8,56 @@ type Fines struct {
 }
 
 type Data struct {
-	XMLName      xml.Name      `xml:"data" json:"-"`
-	ParkingFines []ParkingFine `xml:"parkingFine" json:"parking_fines"`
+	XMLName   xml.Name   `xml:"data" json:"-"`
+	CarsFines []CarsFine `xml:"carsFine" json:"cars_fines"`
 }
 
-type ParkingFine struct {
-	XMLName   xml.Name `xml:"parkingFine"`
-	ID        string   `json:"id"`
-	FineNum   string   `xml:"fineNum" json:"fine_num"`
-	IssueTime string   `xml:"issueTime" json:"issue_time"`
-	CarVIN    string   `xml:"carVIN" json:"car_VIN"`
-	Cost      int      `xml:"cost" json:"cost"`
-	PhotoURL  string   `xml:"photo_url" json:"photo_url"`
+type DriversFine struct {
+	Id                        string `json:"id"`
+	LicenceNumber             string `json:"licence_number"`
+	FineNum                   string `json:"fine_num"`
+	DataAndTime               string `json:"data_and_time"`
+	Place                     string `json:"place"`
+	FileLawArticle            string `json:"file_law_article"`
+	Price                     int    `json:"price"`
+	VehicleRegistrationNumber string `json:"vehicle_registration_number"`
 }
 
-func MakeParkingFine(FineNum, IssueTime, CarID string, Cost int, PhotoURL string) ParkingFine {
-	return ParkingFine{FineNum: FineNum, IssueTime: IssueTime, CarVIN: CarID, Cost: Cost, PhotoURL: PhotoURL}
+type CarsFine struct {
+	Id                        string `json:"id" xml:"id"`
+	VehicleRegistrationNumber string `json:"vehicle_registration_number" xml:"regNum"`
+	FineNum                   string `json:"fine_num" xml:"fineNum"`
+	DataAndTime               string `json:"data_and_time" xml:"dataAndTime"`
+	Place                     string `json:"place" xml:"place"`
+	FileLawArticle            string `json:"file_law_article" xml:"fileLawArticle"`
+	Price                     int    `json:"price" xml:"price"`
+	Info                      string `json:"info" xml:"info"`
+	ImdUrl                    string `json:"imd_url" xml:"imdURL"`
+}
+
+// NewDriversFine returns a pointer to a new DriversFine
+func NewDriversFine(licenceNumber, fineNum, dataTime, place, fileLawArticle string, price int, regNum string) *DriversFine {
+	return &DriversFine{
+		LicenceNumber:             licenceNumber,
+		FineNum:                   fineNum,
+		DataAndTime:               dataTime,
+		Place:                     place,
+		FileLawArticle:            fileLawArticle,
+		Price:                     price,
+		VehicleRegistrationNumber: regNum,
+	}
+}
+
+// NewCarsFine returns a pointer to a new CarsFine
+func NewCarsFine(regNum, fineNum, dataTime, place, fileLawArticle string, price int, info, imdURL string) *CarsFine {
+	return &CarsFine{
+		VehicleRegistrationNumber: regNum,
+		FineNum:                   fineNum,
+		DataAndTime:               dataTime,
+		Place:                     place,
+		FileLawArticle:            fileLawArticle,
+		Price:                     price,
+		Info:                      info,
+		ImdUrl:                    imdURL,
+	}
 }
