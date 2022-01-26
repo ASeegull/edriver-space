@@ -123,6 +123,21 @@ func (mr *MockUsersMockRecorder) PayFines(ctx, fines interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PayFines", reflect.TypeOf((*MockUsers)(nil).PayFines), ctx, fines)
 }
 
+// PoliceSignUp mocks base method.
+func (m *MockUsers) PoliceSignUp(ctx context.Context, user service.UserSignUpInput) (service.Tokens, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PoliceSignUp", ctx, user)
+	ret0, _ := ret[0].(service.Tokens)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// PoliceSignUp indicates an expected call of PoliceSignUp.
+func (mr *MockUsersMockRecorder) PoliceSignUp(ctx, user interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PoliceSignUp", reflect.TypeOf((*MockUsers)(nil).PoliceSignUp), ctx, user)
+}
+
 // RefreshTokens mocks base method.
 func (m *MockUsers) RefreshTokens(ctx context.Context, sessionId string) (service.Tokens, error) {
 	m.ctrl.T.Helper()
