@@ -7,27 +7,32 @@ import (
 	"github.com/ASeegull/edriver-space/model"
 	"github.com/ASeegull/edriver-space/pkg/auth"
 	"github.com/ASeegull/edriver-space/pkg/hash"
+	"github.com/ASeegull/edriver-space/pkg/payment"
 	"github.com/ASeegull/edriver-space/repository"
 	"golang.org/x/sync/errgroup"
 	"time"
 )
 
 type UsersService struct {
-	usersRepos   repository.Users
-	sessionRepos repository.Sessions
-	tokenManager auth.TokenManager
-	hasher       hash.PasswordHasher
-	cfg          *config.Config
+	usersRepos       repository.Users
+	sessionRepos     repository.Sessions
+	carFinesRepos    repository.CarFines
+	driverFinesRepos repository.DriverFines
+	tokenManager     auth.TokenManager
+	hasher           hash.PasswordHasher
+	cfg              *config.Config
 }
 
-func NewUsersService(userRepos repository.Users, sessionRepos repository.Sessions,
-	tokenManager auth.TokenManager, hasher hash.PasswordHasher, cfg *config.Config) *UsersService {
+func NewUsersService(userRepos repository.Users, sessionRepos repository.Sessions, carFinesRepos repository.CarFines,
+	driverFinesRepos repository.DriverFines, tokenManager auth.TokenManager, hasher hash.PasswordHasher, cfg *config.Config) *UsersService {
 	return &UsersService{
-		usersRepos:   userRepos,
-		sessionRepos: sessionRepos,
-		tokenManager: tokenManager,
-		hasher:       hasher,
-		cfg:          cfg,
+		usersRepos:       userRepos,
+		sessionRepos:     sessionRepos,
+		carFinesRepos:    carFinesRepos,
+		driverFinesRepos: driverFinesRepos,
+		tokenManager:     tokenManager,
+		hasher:           hasher,
+		cfg:              cfg,
 	}
 }
 
@@ -180,4 +185,93 @@ func (s *UsersService) GetFines(ctx context.Context, userId string) (model.Fines
 	}
 
 	return model.Fines{CarsFines: carsFines, DriversFines: driversFines}, nil
+}
+
+// PayFines provides logic for paying fines sent as an argument
+func (s *UsersService) PayFines(ctx context.Context, fines model.Fines) error {
+	var totalCost int
+
+	// Go through all fines and collect their total price
+	for _, driverFine := range fines.DriversFines {
+		totalCost += driverFine.Price
+	}
+	for _, carFines := range fines.CarsFines {
+		totalCost += carFines.Price
+	}
+
+	// Call payment service
+	inputFunds := totalCost
+	err := payment.DoPayment(inputFunds, totalCost)
+	if err != nil {
+		return err
+	}
+
+	// Payment successful, remove fines from the database
+	g, groupCtx := errgroup.WithContext(ctx)
+
+	g.Go(func() error { // Removing driver fines
+		for _, driverFine := range fines.DriversFines {
+			err := s.driverFinesRepos.DeleteDriverFine(groupCtx, driverFine.FineNum)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+
+	g.Go(func() error { // Removing car fines
+		for _, carFine := range fines.CarsFines {
+			err := s.carFinesRepos.DeleteCarFine(groupCtx, carFine.FineNum)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+
+	if err = g.Wait(); err != nil {
+		return err
+	}
+	return nil
+}
+
+// PayFine provides logic for paying one fine of current user with given fine number
+func (s *UsersService) PayFine(ctx context.Context, fines model.Fines, fineNum string) error {
+	// Find needed fine in driver fines
+	for _, driverFine := range fines.DriversFines {
+		if driverFine.FineNum == fineNum { // If needed fine was found
+			// Pay the fine
+			inputFunds := driverFine.Price
+			err := payment.DoPayment(inputFunds, driverFine.Price)
+			if err != nil {
+				return err
+			}
+			// Remove fine from the database
+			err = s.driverFinesRepos.DeleteDriverFine(ctx, driverFine.FineNum)
+			if err != nil {
+				return err
+			}
+			return nil // If all correct
+		}
+	}
+	// Find needed fine in car fines
+	for _, carFine := range fines.CarsFines {
+		if carFine.FineNum == fineNum { // If needed fine was found
+			// Pay the fine
+			inputFunds := carFine.Price
+			err := payment.DoPayment(inputFunds, carFine.Price)
+			if err != nil {
+				return err
+			}
+			// Remove fine from the database
+			err = s.carFinesRepos.DeleteCarFine(ctx, carFine.FineNum)
+			if err != nil {
+				return err
+			}
+			return nil // If all correct
+		}
+	}
+	// In case fine was not found
+	err := errors.New("there is no fine with provided fine number assigned to you")
+	return err
 }

@@ -9,4 +9,5 @@ var (
 	ErrWrongFileType         = errors.New("wrong file type")
 	ErrUserWithEmailExist    = errors.New("the user with such email is registered")
 	ErrJWTEmpty              = errors.New("JWT token has empty body")
+	ErrInsufficientFunds     = errors.New("operation refused due to insufficient funds")
 )
