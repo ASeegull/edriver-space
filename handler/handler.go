@@ -11,6 +11,7 @@ type Users interface {
 	InitUsersRoutes(e *echo.Group, mw middleware.Middleware)
 	SignIn() echo.HandlerFunc
 	SignUp() echo.HandlerFunc
+	PoliceSignUp() echo.HandlerFunc
 	SignOut() echo.HandlerFunc
 	RefreshTokens() echo.HandlerFunc
 	AddDriverLicence() echo.HandlerFunc
