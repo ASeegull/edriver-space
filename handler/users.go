@@ -36,6 +36,7 @@ func (h *UsersHandlers) InitUsersRoutes(e *echo.Group, mw middleware.Middleware)
 
 	authenticated.POST("add-driver-licence", h.AddDriverLicence())
 	authenticated.GET("fines", h.GetFines())
+	authenticated.POST("add-vehicle", h.AddVehicle())
 	authenticated.DELETE("/fines", h.PayAllFines()) // Pay all user fines
 	authenticated.DELETE("/fine", h.PayFine())      // Pay specific user fine
 }
@@ -298,5 +299,43 @@ func (h *UsersHandlers) PayFine() echo.HandlerFunc {
 			return ctx.JSON(http.StatusInternalServerError, err.Error())
 		}
 		return ctx.JSON(http.StatusOK, "Your fine was successfully payed")
+	}
+}
+
+type addVehicleInput struct {
+	VinCode            string `json:"vin_code" validate:"required"`
+	RegistrationNumber string `json:"registration_number" validate:"required"`
+}
+
+func (h *UsersHandlers) AddVehicle() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var input addVehicleInput
+
+		if err := c.Bind(&input); err != nil {
+			return c.JSON(http.StatusBadRequest, "input body has not json format")
+		}
+
+		if err := c.Validate(input); err != nil {
+			return c.JSON(http.StatusBadRequest, "invalid input body")
+		}
+
+		userId, ok := c.Get("userId").(string)
+		if !ok {
+			return c.JSON(http.StatusForbidden, "user id not present in context")
+		}
+
+		serviceInput := service.AddVehicleInput{
+			VinCode:            input.VinCode,
+			RegistrationNumber: input.RegistrationNumber,
+		}
+
+		if err := h.usersService.AddVehicle(c.Request().Context(), serviceInput, userId); err != nil {
+			if errors.Is(err, model.ErrCarIsAdded) || errors.Is(err, model.ErrCarDoesNotExist) {
+				return c.JSON(http.StatusBadRequest, err.Error())
+			}
+			return c.JSON(http.StatusInternalServerError, err.Error())
+		}
+
+		return c.JSON(http.StatusCreated, "vehicle successfully added")
 	}
 }

@@ -14,6 +14,7 @@ type Users interface {
 	SignOut() echo.HandlerFunc
 	RefreshTokens() echo.HandlerFunc
 	AddDriverLicence() echo.HandlerFunc
+	AddVehicle() echo.HandlerFunc
 	GetFines() echo.HandlerFunc
 	PayAllFines() echo.HandlerFunc
 	PayFine() echo.HandlerFunc
