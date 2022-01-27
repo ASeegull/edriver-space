@@ -25,6 +25,8 @@ func NewUsersHandlers(usersService service.Users, cfg *config.Config) *UsersHand
 }
 
 func (h *UsersHandlers) InitUsersRoutes(e *echo.Group, mw middleware.Middleware) {
+	e.POST("/police/sign-up", h.PoliceSignUp())
+
 	users := e.Group("/users")
 
 	users.POST("/sign-in", h.SignIn())
