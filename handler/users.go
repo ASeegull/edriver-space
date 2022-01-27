@@ -30,6 +30,7 @@ func (h *UsersHandlers) InitUsersRoutes(e *echo.Group, mw middleware.Middleware)
 	users.POST("/sign-in", h.SignIn())
 	users.POST("/sign-out", h.SignOut())
 	users.POST("/sign-up", h.SignUp())
+	users.POST("/sign-up/police", h.PoliceSignUp())
 	users.GET("/refresh-tokens", h.RefreshTokens())
 
 	authenticated := users.Group("/", mw.UserIdentity())
