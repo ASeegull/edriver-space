@@ -20,6 +20,7 @@ type Users interface {
 	GetUserById(ctx context.Context, userId string) (*model.User, error)
 	DeleteSession(ctx context.Context, sessionId string) error
 	AddDriverLicence(ctx context.Context, input AddDriverLicenceInput, userId string) error
+	AddVehicle(ctx context.Context, input AddVehicleInput, userId string) error
 	GetFines(ctx context.Context, userId string) (model.Fines, error)
 	PayFines(ctx context.Context, fines model.Fines) error
 	PayFine(ctx context.Context, fines model.Fines, fineNum string) error
