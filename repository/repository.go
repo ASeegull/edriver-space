@@ -17,6 +17,7 @@ type Users interface {
 	UpdateUserDriverLicence(ctx context.Context, userId, licenceNumber string) error
 	GetCarsFines(ctx context.Context, userId string) ([]model.CarsFine, error)
 	GetDriversFines(ctx context.Context, userId string) ([]model.DriversFine, error)
+	ConnectCarAndUser(ctx context.Context, car model.Car, userId string) error
 }
 
 type Sessions interface {
