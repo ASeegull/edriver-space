@@ -21,7 +21,6 @@ func UpDrivers(tx *sql.Tx) error {
 			expire_date           DATE               NOT NULL,
 			licence_number        VARCHAR(55) UNIQUE NOT NULL,
 			category              VARCHAR(25)        NOT NULL,
-			category_issuing_date DATE               NOT NULL,
 			individual_tax_number VARCHAR(55) UNIQUE NOT NULL
 		);`
 	_, err := tx.Exec(query)
