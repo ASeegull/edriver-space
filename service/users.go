@@ -179,6 +179,16 @@ func (s *UsersService) AddDriverLicence(ctx context.Context, input AddDriverLice
 	return s.usersRepos.UpdateUserDriverLicence(ctx, userId, licenceNumber)
 }
 
+type AddVehicleInput struct {
+	VinCode            string
+	RegistrationNumber string
+}
+
+func (s *UsersService) AddVehicle(ctx context.Context, input AddVehicleInput, userId string) error {
+
+	return s.usersRepos.ConnectCarAndUser(ctx, model.Car{VIN: input.VinCode, RegistrationNum: input.RegistrationNumber}, userId)
+}
+
 func (s *UsersService) GetFines(ctx context.Context, userId string) (model.Fines, error) {
 	var (
 		err error

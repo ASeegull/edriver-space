@@ -178,3 +178,36 @@ func (r *UsersRepos) GetDriversFines(ctx context.Context, userId string) ([]mode
 
 	return driversFines, nil
 }
+
+func (r *UsersRepos) ConnectCarAndUser(ctx context.Context, car model.Car, userId string) error {
+	var checkId string
+
+	row := r.db.QueryRowContext(
+		ctx,
+		"SELECT user_id FROM cars_owners WHERE car_id IN (SELECT id FROM cars WHERE vin_code = $1 AND registration_number = $2)",
+		car.VIN, car.RegistrationNum,
+	)
+
+	if err := row.Scan(&checkId); err != nil {
+		if err != sql.ErrNoRows {
+			return err
+		}
+	}
+	// check if the car is connected to the user
+	if userId == checkId {
+		return model.ErrCarIsAdded
+	}
+
+	result, err := r.db.ExecContext(ctx,
+		"INSERT INTO cars_owners(user_id, car_id) (SELECT $1, id FROM cars WHERE vin_code = $2 AND registration_number = $3)",
+		userId, car.VIN, car.RegistrationNum)
+	if err != nil {
+		return err
+	}
+	// check if the found car is added to the user
+	num, _ := result.RowsAffected()
+	if num != 1 {
+		return model.ErrCarDoesNotExist
+	}
+	return nil
+}
