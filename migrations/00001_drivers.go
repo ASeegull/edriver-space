@@ -2,6 +2,7 @@ package migrations
 
 import (
 	"database/sql"
+
 	"github.com/pressly/goose/v3"
 )
 
@@ -21,8 +22,6 @@ func UpDrivers(tx *sql.Tx) error {
 			licence_number        VARCHAR(55) UNIQUE NOT NULL,
 			category              VARCHAR(25)        NOT NULL,
 			category_issuing_date DATE               NOT NULL,
-			category_expire       DATE               NOT NULL,
-			restrictions          VARCHAR(255) DEFAULT '-',
 			individual_tax_number VARCHAR(55) UNIQUE NOT NULL
 		);`
 	_, err := tx.Exec(query)
