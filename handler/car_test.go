@@ -6,6 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/pkg/errors"
+
 	"github.com/ASeegull/edriver-space/config"
 	"github.com/ASeegull/edriver-space/model"
 	"github.com/ASeegull/edriver-space/pkg/validator"
@@ -17,85 +19,83 @@ import (
 )
 
 func TestCarsHandler_CreateCar(t *testing.T) {
-	type mockBehavior func(s *mock_service.MockCars, car model.Car)
+	type mockBehavior func(s *mock_service.MockCars, car *model.Car)
 
 	testTable := []struct {
 		name         string
 		requestBody  string
-		serviceInput model.Car
+		serviceInput *model.Car
 		mockBehavior mockBehavior
 		statusCode   int
 	}{{
 		name: "Valid input",
 		requestBody: `{
-			"id":                                    "4",
-			"make":                                  "test",
-			"type":                                  "test",
-			"commercial_description":                "test",
-			"VIN_code":                              "sss",
-			"maximum_mass":                           1,
-			"mass_of_the_vehicle_in_service":         1,
-			"vehicle_category":                      "rrr",
-			"capacity":                               1,
+			"id":                                    "1",
+			"mark":                                  "BMW",
+			"type":                                  "E31",
+			"VIN_code":                              "1234567986",
+			"maximum_mass":                           184,
+			"vehicle_category":                      "M",
 			"colour_of_the_vehicle":                 "red",
 			"number_of_seats_including_drivers_seat": 4,
-			"registration_number":                   "test",
-			"date_of_first_registration":            "2020-01-01",
-			"full_name":                             "TEST",
-			"address":                               "TEST",
-			"ownership":                             "TEST",
-			"period_of_validity":                    "2020-01-01",
+			"registration_number":                   "BC345966",
+			"full_name":                             "Ivan Ivanov",
+			"period_of_validity":                    "2024-01-01",
 			"date_of_registration":                  "2020-01-01"
 			}`,
-		serviceInput: model.Car{
-			ID:                    "4",
-			Make:                  "test",
-			Type:                  "test",
-			CommercialDescription: "test",
-			VIN:                   "sss",
-			MaxMass:               1,
-			ServiceMass:           1,
-			VehicleCategory:       "rrr",
-			Capacity:              1,
-			Colour:                "red",
-			SeatsNum:              4,
-			RegistrationNum:       "test",
-			FirstRegDate:          "2020-01-01",
-			FullName:              "TEST",
-			Address:               "TEST",
-			Ownership:             "TEST",
-			ValidityPeriod:        "2020-01-01",
-			RegistrationDate:      "2020-01-01",
+		serviceInput: &model.Car{
+			ID:               "1",
+			Mark:             "BMW",
+			Type:             "E31",
+			VIN:              "1234567986",
+			MaxMass:          184,
+			VehicleCategory:  "M",
+			Colour:           "red",
+			SeatsNum:         4,
+			RegistrationNum:  "BC345966",
+			FullName:         "Ivan Ivanov",
+			ValidityPeriod:   "2024-01-01",
+			RegistrationDate: "2020-01-01",
 		},
-		mockBehavior: func(r *mock_service.MockCars, car model.Car) {
-			r.EXPECT().CreateCar(context.Background(), car).Return(car, nil)
+		mockBehavior: func(r *mock_service.MockCars, car *model.Car) {
+			r.EXPECT().CreateCar(context.Background(), car).Return(car, nil).Times(1)
 		},
-		statusCode: 200,
+		statusCode: 201,
 	},
 		{
 			name: "Invalid Input",
 			requestBody: `{
-			"id":                                    "",
-			"make":                                  "",
-			"type":                                  "",
-			"commercial_description":                "test",
-			"VIN_code":                              "sss",
-			"maximum_mass":                           1,
-			"mass_of_the_vehicle_in_service":         1,
-			"vehicle_category":                      "rrr",
-			"capacity":                               1,
-			"colour_of_the_vehicle":                 "red",
-			"number_of_seats_including_drivers_seat": 4,
-			"registration_number":                   "test",
-			"date_of_first_registration":            "2020-01-01",
-			"full_name":                             "TEST",
-			"address":                               "TEST",
-			"ownership":                             "TEST",
-			"period_of_validity":                    "2020-01-01",
-			"date_of_registration":                  "2020-01-01"
+				"id":                                    "",
+			    "mark":                                  "",
+			    "type":                                  "E31",
+			    "VIN_code":                              "1234567986",
+			    "maximum_mass":                           184,
+			    "vehicle_category":                      "M",
+			    "colour_of_the_vehicle":                 "red",
+			    "number_of_seats_including_drivers_seat": 4,
+			    "registration_number":                   "BC345966",
+			    "full_name":                             "Ivan Ivanov",
+			    "period_of_validity":                    "2024-01-01",
+			    "date_of_registration":                  "2020-01-01"
 			}`,
-			mockBehavior: func(r *mock_service.MockCars, car model.Car) {},
-			statusCode:   400,
+			serviceInput: &model.Car{
+				ID:               "",
+				Mark:             "",
+				Type:             "E31",
+				VIN:              "1234567986",
+				MaxMass:          184,
+				VehicleCategory:  "M",
+				Colour:           "red",
+				SeatsNum:         4,
+				RegistrationNum:  "BC345966",
+				FullName:         "Ivan Ivanov",
+				ValidityPeriod:   "2024-01-01",
+				RegistrationDate: "2020-01-01",
+			},
+			mockBehavior: func(r *mock_service.MockCars, car *model.Car) {
+				r.EXPECT().CreateCar(context.Background(), car).Return(nil, errors.New("error")).Times(1)
+			},
+			statusCode: 400,
 		},
 	}
 

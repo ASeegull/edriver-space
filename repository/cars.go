@@ -22,42 +22,29 @@ func NewCarsRepos(db *sql.DB) *CarsRepos {
 func (c *CarsRepos) CreateCar(ctx context.Context, car *model.Car) (*model.Car, error) {
 	query := `INSERT INTO cars(
 		    id,
-            make,
+            mark,
             type,
-            commercial_description,
             VIN_code,
             maximum_mass,
-            mass_of_the_vehicle_in_service,
             vehicle_category,
-            capacity,
             colour_of_the_vehicle,
             number_of_seats_including_drivers_seat,
             registration_number,
-            date_of_first_registration,
             full_name,
-            address,
-            ownership,
             period_of_validity,
             date_of_registration) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 
-			$12, $13, $14, $15, $16, $17, $18)`
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`
 	_, err := c.db.ExecContext(ctx, query,
 		car.ID,
-		car.Make,
+		car.Mark,
 		car.Type,
-		car.CommercialDescription,
 		car.VIN,
 		car.MaxMass,
-		car.ServiceMass,
 		car.VehicleCategory,
-		car.Capacity,
 		car.Colour,
 		car.SeatsNum,
 		car.RegistrationNum,
-		car.FirstRegDate,
 		car.FullName,
-		car.Address,
-		car.Ownership,
 		car.ValidityPeriod,
 		car.RegistrationDate,
 	)
@@ -76,25 +63,19 @@ func (c *CarsRepos) GetCar(ctx context.Context, id string) (*model.Car, error) {
 	query := `SELECT * FROM cars WHERE id = $1`
 
 	err := c.db.QueryRowContext(ctx, query, id).Scan(
-		&car.ID,
-		&car.Make,
-		&car.Type,
-		&car.CommercialDescription,
-		&car.VIN,
-		&car.MaxMass,
-		&car.ServiceMass,
-		&car.VehicleCategory,
-		&car.Capacity,
-		&car.Colour,
-		&car.SeatsNum,
-		&car.RegistrationNum,
-		&car.FirstRegDate,
-		&car.FullName,
-		&car.Address,
-		&car.Ownership,
-		&car.ValidityPeriod,
-		&car.RegistrationDate)
-
+		car.ID,
+		car.Mark,
+		car.Type,
+		car.VIN,
+		car.MaxMass,
+		car.VehicleCategory,
+		car.Colour,
+		car.SeatsNum,
+		car.RegistrationNum,
+		car.FullName,
+		car.ValidityPeriod,
+		car.RegistrationDate,
+	)
 	if err != nil {
 		err = errors.New("error retrieving car id from the database")
 		return nil, err
@@ -114,24 +95,18 @@ func (c CarsRepos) GetCars(ctx context.Context) (*[]model.Car, error) {
 	for rows.Next() {
 		car := model.Car{}
 		err = rows.Scan(
-			&car.ID,
-			&car.Make,
-			&car.Type,
-			&car.CommercialDescription,
-			&car.VIN,
-			&car.MaxMass,
-			&car.ServiceMass,
-			&car.VehicleCategory,
-			&car.Capacity,
-			&car.Colour,
-			&car.SeatsNum,
-			&car.RegistrationNum,
-			&car.FirstRegDate,
-			&car.FullName,
-			&car.Address,
-			&car.Ownership,
-			&car.ValidityPeriod,
-			&car.RegistrationDate,
+			car.ID,
+			car.Mark,
+			car.Type,
+			car.VIN,
+			car.MaxMass,
+			car.VehicleCategory,
+			car.Colour,
+			car.SeatsNum,
+			car.RegistrationNum,
+			car.FullName,
+			car.ValidityPeriod,
+			car.RegistrationDate,
 		)
 
 		if err != nil {
