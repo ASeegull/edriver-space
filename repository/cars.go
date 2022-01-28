@@ -33,7 +33,7 @@ func (c *CarsRepos) CreateCar(ctx context.Context, car *model.Car) (*model.Car, 
             full_name,
             period_of_validity,
             date_of_registration) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`
 	_, err := c.db.ExecContext(ctx, query,
 		car.ID,
 		car.Mark,
