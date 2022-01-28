@@ -25,6 +25,8 @@ func NewUsersHandlers(usersService service.Users, cfg *config.Config) *UsersHand
 }
 
 func (h *UsersHandlers) InitUsersRoutes(e *echo.Group, mw middleware.Middleware) {
+	e.POST("/police/sign-up", h.PoliceSignUp())
+
 	users := e.Group("/users")
 
 	users.POST("/sign-in", h.SignIn())
@@ -103,6 +105,42 @@ func (h *UsersHandlers) SignUp() echo.HandlerFunc {
 		}
 
 		tokens, err := h.usersService.SignUp(c.Request().Context(), service.UserSignUpInput{
+			Firstname: input.Firstname,
+			Lastname:  input.Lastname,
+			Email:     input.Email,
+			Password:  input.Password,
+		})
+
+		if err != nil {
+			if errors.Is(err, model.ErrUserNotFound) {
+				return c.JSON(http.StatusBadRequest, err.Error())
+			}
+			return c.JSON(http.StatusInternalServerError, err.Error())
+		}
+
+		c.SetCookie(h.createCookie(tokens.RefreshToken))
+
+		return c.JSON(http.StatusOK, tokenResponse{
+			AccessToken:  tokens.AccessToken,
+			RefreshToken: tokens.RefreshToken,
+		})
+	}
+}
+
+// PoliceSignUp allows user to sign up and get a police role
+func (h *UsersHandlers) PoliceSignUp() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var input signUpInput
+
+		if err := c.Bind(&input); err != nil {
+			return c.JSON(http.StatusBadRequest, "input body has not json format")
+		}
+
+		if err := c.Validate(input); err != nil {
+			return c.JSON(http.StatusBadRequest, "invalid input body")
+		}
+
+		tokens, err := h.usersService.PoliceSignUp(c.Request().Context(), service.UserSignUpInput{
 			Firstname: input.Firstname,
 			Lastname:  input.Lastname,
 			Email:     input.Email,

@@ -50,6 +50,29 @@ func (r *UsersRepos) CreateUser(ctx context.Context, newUser model.User) (string
 	return userId, nil
 }
 
+// CreateUserPolice adds new user with police role to the database
+func (r *UsersRepos) CreateUserPolice(ctx context.Context, newUser model.User) (string, error) {
+	_, err := r.db.ExecContext(ctx, "INSERT INTO users(firstname, lastname, email, password, role) VALUES ($1, $2, $3, $4, $5)",
+		newUser.Firstname, newUser.Lastname, newUser.Email, newUser.Password, "police")
+	if err != nil {
+		// convert to postgres error
+		if err, ok := err.(*pq.Error); ok {
+			// unique_violation
+			if err.Code == "23505" {
+				return "", model.ErrUserWithEmailExist
+			}
+		}
+		return "", err
+	}
+
+	var userId string
+
+	if err = r.db.QueryRowContext(ctx, "SELECT id FROM users WHERE email = $1", newUser.Email).Scan(&userId); err != nil {
+		return "", err
+	}
+	return userId, nil
+}
+
 func (r *UsersRepos) getUser(ctx context.Context, query string, args ...interface{}) (*model.User, error) {
 	user := &model.User{}
 

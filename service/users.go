@@ -112,6 +112,27 @@ func (s *UsersService) SignUp(ctx context.Context, user UserSignUpInput) (Tokens
 	return s.createSession(ctx, userId)
 }
 
+// PoliceSignUp provides logic for creating a new user with police role
+func (s *UsersService) PoliceSignUp(ctx context.Context, user UserSignUpInput) (Tokens, error) {
+	passwordHash, err := s.hasher.Hash(user.Password)
+	if err != nil {
+		return Tokens{}, err
+	}
+
+	newUser := model.User{
+		Firstname: &user.Firstname,
+		Lastname:  &user.Lastname,
+		Email:     &user.Email,
+		Password:  &passwordHash,
+	}
+
+	userId, err := s.usersRepos.CreateUser(ctx, newUser)
+	if err != nil {
+		return Tokens{}, err
+	}
+	return s.createSession(ctx, userId)
+}
+
 func (s *UsersService) createSession(ctx context.Context, userId string) (Tokens, error) {
 	var (
 		res Tokens
