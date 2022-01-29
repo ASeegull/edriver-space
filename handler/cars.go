@@ -48,11 +48,10 @@ func (carsHandler *CarsHandlers) CreateCar() echo.HandlerFunc {
 
 func (carsHandler *CarsHandlers) GetCar() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		// id, ok := c.Get("id").(string)
-		id := c.Param("id")
-		// if !ok {
-		// 	return c.JSON(http.StatusUnauthorized, "car id is not present in context")
-		// }
+		id, ok := c.Get("id").(string)
+		if !ok {
+			return c.JSON(http.StatusUnauthorized, "car id is not present in context")
+		}
 
 		car, err := carsHandler.carService.GetCar(c.Request().Context(), id)
 		if err != nil {

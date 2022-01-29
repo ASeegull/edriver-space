@@ -28,7 +28,7 @@ func (d *DriversRepos) CreateDriver(ctx context.Context, driver *model.Driver) (
 		expire_date,
 		license_number,
 		category,
-		individual_tax_number,
+		individual_tax_number)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
 
 	_, err := d.db.ExecContext(ctx, query,
