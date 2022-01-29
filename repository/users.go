@@ -113,7 +113,7 @@ func (r *UsersRepos) GetCarsFines(ctx context.Context, userId string) ([]model.C
 	var carsFines []model.CarsFine
 
 	rows, err := r.db.QueryContext(ctx,
-		"SELECT * FROM cars_fines WHERE id IN (SELECT car_id FROM cars_owners WHERE user_id = $1)", userId)
+		`SELECT * FROM cars_fines WHERE vehicle_registration_number IN ( SELECT registration_number FROM cars WHERE id IN (SELECT car_id FROM cars_owners WHERE user_id = $1))`, userId)
 	if err != nil {
 		return []model.CarsFine{}, err
 	}
