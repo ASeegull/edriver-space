@@ -19,7 +19,7 @@ func UpDrivers(tx *sql.Tx) error {
 			place_of_birth        VARCHAR(255)       NOT NULL,
 			date_of_issue         DATE               NOT NULL,
 			expire_date           DATE               NOT NULL,
-			license_number        VARCHAR(55) UNIQUE NOT NULL,
+			licence_number        VARCHAR(55) UNIQUE NOT NULL,
 			category              VARCHAR(25)        NOT NULL,
 			individual_tax_number VARCHAR(55) UNIQUE NOT NULL
 		);`
