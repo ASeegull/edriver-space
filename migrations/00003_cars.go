@@ -23,7 +23,6 @@ func UpCars(tx *sql.Tx) error {
             number_of_seats_including_drivers_seat INT                NOT NULL,
             registration_number                    VARCHAR(25) UNIQUE NOT NULL,
             full_name                              VARCHAR(255)       NOT NULL,
-            ownership                              VARCHAR(255)       NOT NULL,
             period_of_validity                     DATE,
             date_of_registration                   DATE               NOT NULL
 		);`

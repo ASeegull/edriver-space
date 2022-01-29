@@ -63,18 +63,18 @@ func (c *CarsRepos) GetCar(ctx context.Context, id string) (*model.Car, error) {
 	query := `SELECT * FROM cars WHERE id = $1`
 
 	err := c.db.QueryRowContext(ctx, query, id).Scan(
-		car.ID,
-		car.Mark,
-		car.Type,
-		car.VIN,
-		car.MaxMass,
-		car.VehicleCategory,
-		car.Colour,
-		car.SeatsNum,
-		car.RegistrationNum,
-		car.FullName,
-		car.ValidityPeriod,
-		car.RegistrationDate,
+		&car.ID,
+		&car.Mark,
+		&car.Type,
+		&car.VIN,
+		&car.MaxMass,
+		&car.VehicleCategory,
+		&car.Colour,
+		&car.SeatsNum,
+		&car.RegistrationNum,
+		&car.FullName,
+		&car.ValidityPeriod,
+		&car.RegistrationDate,
 	)
 	if err != nil {
 		err = errors.New("error retrieving car id from the database")
@@ -95,18 +95,18 @@ func (c CarsRepos) GetCars(ctx context.Context) (*[]model.Car, error) {
 	for rows.Next() {
 		car := model.Car{}
 		err = rows.Scan(
-			car.ID,
-			car.Mark,
-			car.Type,
-			car.VIN,
-			car.MaxMass,
-			car.VehicleCategory,
-			car.Colour,
-			car.SeatsNum,
-			car.RegistrationNum,
-			car.FullName,
-			car.ValidityPeriod,
-			car.RegistrationDate,
+			&car.ID,
+			&car.Mark,
+			&car.Type,
+			&car.VIN,
+			&car.MaxMass,
+			&car.VehicleCategory,
+			&car.Colour,
+			&car.SeatsNum,
+			&car.RegistrationNum,
+			&car.FullName,
+			&car.ValidityPeriod,
+			&car.RegistrationDate,
 		)
 
 		if err != nil {
