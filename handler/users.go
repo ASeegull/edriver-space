@@ -39,8 +39,8 @@ func (h *UsersHandlers) InitUsersRoutes(e *echo.Group, mw middleware.Middleware)
 	authenticated.POST("add-driver-licence", h.AddDriverLicence())
 	authenticated.GET("fines", h.GetFines())
 	authenticated.POST("add-vehicle", h.AddVehicle())
-	authenticated.DELETE("/fines", h.PayAllFines()) // Pay all user fines
-	authenticated.DELETE("/fine", h.PayFine())      // Pay specific user fine
+	authenticated.DELETE("fines", h.PayAllFines()) // Pay all user fines
+	authenticated.DELETE("fine", h.PayFine())      // Pay specific user fine
 }
 
 type singInInput struct {
