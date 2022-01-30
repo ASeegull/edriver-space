@@ -126,7 +126,7 @@ func (s *UsersService) PoliceSignUp(ctx context.Context, user UserSignUpInput) (
 		Password:  &passwordHash,
 	}
 
-	userId, err := s.usersRepos.CreateUser(ctx, newUser)
+	userId, err := s.usersRepos.CreateUserPolice(ctx, newUser)
 	if err != nil {
 		return Tokens{}, err
 	}
@@ -139,12 +139,17 @@ func (s *UsersService) createSession(ctx context.Context, userId string) (Tokens
 		err error
 	)
 
+	user, err := s.usersRepos.GetUserById(ctx, userId)
+	if err != nil {
+		return Tokens{}, err
+	}
+
 	g := new(errgroup.Group)
 
 	g.Go(func() error {
 		accessTokenTTL := time.Duration(s.cfg.Token.AccessTTL) * time.Minute
 
-		res.AccessToken, err = s.tokenManager.NewJWT(userId, "user", accessTokenTTL)
+		res.AccessToken, err = s.tokenManager.NewJWT(userId, *user.Role, accessTokenTTL)
 
 		return err
 	})
