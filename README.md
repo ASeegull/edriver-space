@@ -4,6 +4,10 @@
 [![Unit tests](https://github.com/ASeegull/edriver-space/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/ASeegull/edriver-space/actions/workflows/unit-tests.yml)
 [![Go Report Card](https://goreportcard.com/badge/ASeegull/edriver-space)](https://goreportcard.com/report/ASeegull/edriver-space)
 [![Coverage Status](https://coveralls.io/repos/github/ASeegull/edriver-space/badge.svg?branch=main)](https://coveralls.io/github/ASeegull/edriver-space?branch=main)
+
+![image](https://user-images.githubusercontent.com/72625402/151699257-2fdd3125-488d-4c32-9fa0-122323d4cc4b.png)
+
+
 ![Edit diagram](docs/images/e-driver.drawio.svg)
 
 ### Recommended workspace layout
