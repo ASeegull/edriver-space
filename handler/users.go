@@ -214,7 +214,7 @@ type addDriverLicenceInput struct {
 	IndividualTaxNumber string `json:"individual_tax_number" validate:"required"`
 }
 
-func (h UsersHandlers) AddDriverLicence() echo.HandlerFunc {
+func (h *UsersHandlers) AddDriverLicence() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var input addDriverLicenceInput
 
